@@ -45,42 +45,46 @@
     \renewcommand{\bibname}{References} %to rename bibliography section to "References"
 
     
-    % Redefine the chapter command
-    \makeatletter
-    \def\@makechapterhead#1{%
-    \vspace*{20\p@}% Space before chapter title
-    {\parindent \z@ \raggedright \normalfont
-        \ifnum \c@secnumdepth >\m@ne
-        \Large\bfseries \thechapter\quad % Only the chapter number and a space
-        \fi
-        \Large\bfseries #1\par\nobreak % The title next to the number
-        \vskip 20\p@
-    }}
-    \def\@chapapp{}
-    %\makeatother
+    % Set section font size and type, and adjust spacing
+    \titleformat{\section}
+        {\Large\bfseries\sffamily} % Customize font size and type
+        {\thesection}{1em}{}
+    \titlespacing*{\section}
+        {0pt}{3.0ex plus 1ex minus .2ex}{2.0ex plus .2ex}
 
-    % Prevent page breaks between chapters
-    \usepackage{etoolbox}
-    \makeatletter
-    \patchcmd{\chapter}
-    {\if@openright\cleardoublepage\else\clearpage\fi}
-    {}
-    {}
-    {}
-    \makeatother
+    \titleformat{name=\section, numberless}
+        {\Large\bfseries\sffamily} % Customize font size and type
+        {}{0pt}{}
+        
+    % Optionally, customize subsection and subsubsection as well
+    \titleformat{\subsection}
+        {\large\bfseries\itshape}
+        {\thesubsection}{1em}{}
+    \titlespacing*{\subsection}
+        {0pt}{2.0ex plus 1ex minus .2ex}{1.0ex plus .2ex}
 
+    \titleformat{\subsubsection}
+        {\normalsize\bfseries\scshape}
+        {\thesubsubsection}{1em}{}
+    \titlespacing*{\subsubsection}
+        {0pt}{1.5ex plus 1ex minus .2ex}{1.0ex plus .2ex}
+       
+    %defines a new format for the theorems (such as top space, bottom space, text title type, etc.)
     \newtheoremstyle{bfnote}%
-    {}{}
-    {\itshape}{}
-    {\bfseries}{.}
-    { }{\thmname{#1}\thmnumber{ #2}\thmnote{ (#3)}}
+        {16.0pt plus 2.0pt minus 4.0pt}{\topsep} %\topsep is defined as {8.0pt plus 2.0pt minus 4.0pt}
+        {\itshape}{}
+        {\bfseries}{.}
+        { }{\thmname{#1}\thmnumber{ #2}\thmnote{ (#3)}}
 
     \theoremstyle{bfnote}
     
-    \newtheorem{example}{Example}[chapter] %for enumerating examples within a chapter
-    \newtheorem{theorem}{Theorem}[chapter]
+    \newtheorem{example}{Example}[section] %for enumerating examples within a chapter
+    \newtheorem{theorem}{Theorem}[section]
     \newtheorem{corollary}{Corollary}[theorem]
     \newtheorem{definition}{Definition}
+    
+    \renewcommand{\thesection}{\arabic{section}} %to remove 0.x in numbered sections
+    %\renewcommand{\theorem}{\arabic{section}.\arabic{theorem}}
 
 
 \begin{document}
@@ -112,7 +116,7 @@
 \end{titlepage}
 
 %=================TABLE OF CONTENTS AND LIST OF FIGURES=======================
-\chapter{Introduction}
+\section*{Introduction}
 Entities composing the nature constantly alter due to the processes of nature
 and their interactions with the other entities. The concept of conservation, an
 omnipresent phenomena, is therefore the key to understand these processes as it
@@ -126,22 +130,20 @@ throwing light on the discontunuities that arise in its solution space and
 brings forth key ideas and techniques to better combat the challenges in their
 computational implementations. 
 
-\begin{samepage}
-
-\chapter{Double Null Hypersurfaces and Foliations}
+\section{Double Null Hypersurfaces and Foliations}
 This is the first chapter
 
-\chapter{Null Structure Equations}
+\section{Null Structure Equations}
 This is the second chapter
 
-\chapter{Null Hypersurface Regularity}
+\section{Null Hypersurface Regularity}
 This is the third chapter
 
-\chapter{Causality for Spacetimes with Trapped Surfaces}
+\section{Causality for Spacetimes with Trapped Surfaces}
 Obviously! This is the fourth chapter
 
-\chapter{Penrose Incompleteness Theorem}
-\section{Motivation}
+\section{Penrose Incompleteness Theorem}
+\subsection{Motivation}
 \begin{theorem}[Penrose Incompleteness Theorem]
 Let $\left(\mathcal{M}, g\right)$ be a globally hyperbolic
 time-orientable (Hausdorff) spacetime with a non-compact Cauchy Hypersurface
@@ -179,7 +181,7 @@ be extended $\forall \tau \geq 0$ in $\mathcal{M}$.
     \begin{equation*}
         \frac{d^2 x^\sigma}{d\tau^2} + \Gamma^{\sigma}_{\alpha\beta}\frac{dx^\alpha}{d\tau}\dfrac{dx^\beta}{d\tau} = 0
     \end{equation*}
-    , which reduces to $\frac{d^2 x^\sigma}{d\tau^2} = 0$. The general solution of
+    , which reduces to {\large{$\frac{d^2 x^\sigma}{d\tau^2} = 0$}}. The general solution of
     such a differential equation is given by $x^{\mu}\left(\tau\right) = A^\mu
     \tau + B^\mu$, where the constants $A^\mu$ and $B^\mu$ can be determined
     based on the initial data. We see that $x^\mu\left(\tau\right)$ is linear in
@@ -187,7 +189,5 @@ be extended $\forall \tau \geq 0$ in $\mathcal{M}$.
     Since this is true for any arbitrary curve in Minkowski spacetime, this
     completes our proof.
 \end{proof}
-
-\end{samepage}
 
 \end{document}
