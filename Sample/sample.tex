@@ -1,0 +1,56 @@
+\documentclass{report}
+
+% Packages for title page and section formatting
+\usepackage{titling}
+\usepackage{sectsty}
+\usepackage{titlesec}
+\usepackage{lipsum} % For dummy text
+
+% Set section font size and type, and adjust spacing
+\titleformat{\section}
+  {\Large\bfseries\sffamily} % Customize font size and type
+  {\thesection}{1em}{}
+\titlespacing*{\section}
+  {0pt}{3.0ex plus 1ex minus .2ex}{2.0ex plus .2ex}
+
+% Optionally, customize subsection and subsubsection as well
+\titleformat{\subsection}
+  {\large\bfseries\itshape}
+  {\thesubsection}{1em}{}
+\titlespacing*{\subsection}
+  {0pt}{2.0ex plus 1ex minus .2ex}{1.0ex plus .2ex}
+
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\scshape}
+  {\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}
+  {0pt}{1.5ex plus 1ex minus .2ex}{1.0ex plus .2ex}
+
+\begin{document}
+
+% Title page
+\title{My Document Title}
+\author{Author Name}
+\date{\today}
+\maketitle
+\thispagestyle{empty} % Turn off page numbering for title page
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+\lipsum[1] % Dummy text for demonstration
+
+\section{Background}
+\lipsum[2]
+
+\section{Methodology}
+\lipsum[3]
+
+\section{Results}
+\lipsum[4]
+
+\section{Conclusion}
+\lipsum[5]
+
+\end{document}

@@ -1,0 +1,193 @@
+\documentclass[11pt, a4paper]{report}
+    \usepackage[utf8]{inputenc}
+    \usepackage[T1]{fontenc}
+    \usepackage[urw-garamond]{mathdesign} %for using math with garamond font
+    %\usepackage{lmodern}
+    \usepackage{titlesec}
+    \usepackage{amsmath} %for cross-referencing math equations
+    \usepackage[mathscr]{eucal}
+    %\usepackage{amsfonts}
+    \usepackage{amsthm}
+    \usepackage{bm} %for using bold font letters in inline mathematical expressions
+    \usepackage{graphicx}
+    \usepackage{graphics}
+    \usepackage{subcaption}
+    \usepackage{array}
+    \usepackage{epstopdf}
+    \usepackage{titlesec} %for numbering of subsubsection
+    \usepackage{parskip}
+    \usepackage[symbol]{footmisc} % for using footnote with symbols instead of numbers
+    \usepackage{enumitem} %for enumerations of lists with numbers or alphabets and so on.......
+    \usepackage[margin=2cm, includefoot]{geometry}
+    \usepackage[labelfont={small, bf}, textfont={small, it}]{caption} %used for making the captions in images small and italicized
+    
+    % Packages for title page and section formatting
+    \usepackage{titling}
+    \usepackage{sectsty}
+    \usepackage{titlesec}
+
+    % Page Layout
+    \textwidth 165mm    % also can be set to 155mm///// 158mm
+    \textheight 238mm   % standard
+    \topmargin -10mm
+
+    \oddsidemargin 0.1cm
+    \evensidemargin -0.07cm
+    \graphicspath{ {/images/} }
+
+    % Stopping Figures from Using a Whole Page
+    \renewcommand{\topfraction}{0.95}
+    \renewcommand{\textfraction}{0.05}
+    \renewcommand{\floatpagefraction}{0.85}
+    \renewcommand{\baselinestretch}{1.5}
+    \renewcommand*\descriptionlabel[1]{\hspace\leftmargin$#1$}
+    \renewcommand{\thefootnote}{\fnsymbol{footnote}} %for using footnotes with symbols rather than numbers
+    \renewcommand{\bibname}{References} %to rename bibliography section to "References"
+
+    
+    % Redefine the chapter command
+    \makeatletter
+    \def\@makechapterhead#1{%
+    \vspace*{20\p@}% Space before chapter title
+    {\parindent \z@ \raggedright \normalfont
+        \ifnum \c@secnumdepth >\m@ne
+        \Large\bfseries \thechapter\quad % Only the chapter number and a space
+        \fi
+        \Large\bfseries #1\par\nobreak % The title next to the number
+        \vskip 20\p@
+    }}
+    \def\@chapapp{}
+    %\makeatother
+
+    % Prevent page breaks between chapters
+    \usepackage{etoolbox}
+    \makeatletter
+    \patchcmd{\chapter}
+    {\if@openright\cleardoublepage\else\clearpage\fi}
+    {}
+    {}
+    {}
+    \makeatother
+
+    \newtheoremstyle{bfnote}%
+    {}{}
+    {\itshape}{}
+    {\bfseries}{.}
+    { }{\thmname{#1}\thmnumber{ #2}\thmnote{ (#3)}}
+
+    \theoremstyle{bfnote}
+    
+    \newtheorem{example}{Example}[chapter] %for enumerating examples within a chapter
+    \newtheorem{theorem}{Theorem}[chapter]
+    \newtheorem{corollary}{Corollary}[theorem]
+    \newtheorem{definition}{Definition}
+
+
+\begin{document}
+%============================================BEGIN TITLE PAGE===============================================
+\begin{titlepage}
+    \begin{center}
+    %syntax for entering line \line(slope){length} double backslash for change of line. For changing
+    %line one can even leave a space. 
+    \line(1,0){300}\\
+    %for increasing the space between the line and the title [spacing]	
+    [0.2in]
+    \normalsize{\emph {Seminar Report}}\\	
+    \Huge{\bfseries Penrose Incompleteness Theorem}\\
+    [-0.12in]
+    \line(1,0){300}\\
+    
+    \vspace{3in}
+    
+    \LARGE{\bfseries {Prabha Shankar}}\\
+    \small{Masters Student, Mathematical Physics}\\
+    \small{(Department of Mathematics, Leipzig University)}\\
+    
+    \vspace{3cm}
+    \normalsize{\emph {Under the supervision of}}\\
+    \large{\bfseries {Prof. Dr. Stephan Czimek}}\\
+    \small{(Department of Mathematics, Leipzig University)}\\
+    
+    \end{center}
+\end{titlepage}
+
+%=================TABLE OF CONTENTS AND LIST OF FIGURES=======================
+\chapter{Introduction}
+Entities composing the nature constantly alter due to the processes of nature
+and their interactions with the other entities. The concept of conservation, an
+omnipresent phenomena, is therefore the key to understand these processes as it
+helps in the determination of parameters such as quantity of interacting
+material, its velocity, temperature, energy and so forth. This report deals with
+the nature of connservation laws and by means of mathematical modelling helps in
+qualitative understanding of these equations as propagating waves of
+disturbances through a medium. Specifically, this report is an endeavor to
+understand the challenges that arise when numerically solving Hyperbolic PDEs by
+throwing light on the discontunuities that arise in its solution space and
+brings forth key ideas and techniques to better combat the challenges in their
+computational implementations. 
+
+\begin{samepage}
+
+\chapter{Double Null Hypersurfaces and Foliations}
+This is the first chapter
+
+\chapter{Null Structure Equations}
+This is the second chapter
+
+\chapter{Null Hypersurface Regularity}
+This is the third chapter
+
+\chapter{Causality for Spacetimes with Trapped Surfaces}
+Obviously! This is the fourth chapter
+
+\chapter{Penrose Incompleteness Theorem}
+\section{Motivation}
+\begin{theorem}[Penrose Incompleteness Theorem]
+Let $\left(\mathcal{M}, g\right)$ be a globally hyperbolic
+time-orientable (Hausdorff) spacetime with a non-compact Cauchy Hypersurface
+$\mathcal{H}$ such that $\mathcal{M}$ contains a trapped surface $S$. If, in
+addition, $\left(\mathcal{M}, g\right)$ satisfies $\text{\textit{Ric}}\left(L,
+L\right) \geq 0 \;\forall$ null vector fields $L$, then $\mathcal{M}$ is future
+geodesically incomplete. In fact, $\exists$ a null generator of $C \cup
+\underbar{$C$}$, the future null geodesic congruences normal to $S$, that cannot
+be extended $\forall \tau \geq 0$ in $\mathcal{M}$.
+\end{theorem}
+
+\begin{corollary}{\label{MinkGeodcomplete}} 
+    There are no trapped surfaces in Minkowski spacetime as it is geodesic complete.
+\end{corollary}
+
+\begin{definition}[Geodesic Complete]
+    A geodesic complete manifold implies that all its causal geodesics can be
+    extended to arbitrary values of their affine parameters. Formally, a
+    manifold $\left(\mathcal{M}, g\right)$ is geodesically complete if every
+    timelike (or null) geodesic $\gamma : \mathbb{R}\supset \left(-\epsilon,
+    \epsilon\right) \to \mathcal{M}$, such that $\gamma\left(0\right) = p,
+    \;\forall p$ can be extended to $\widetilde{\gamma} : \mathbb{R} \to
+    \mathcal{M}$. That is, the timelike or null geodesics can be extended from a
+    real interval to the entire real line.
+\end{definition}
+
+\begin{proof}[Proof to Corollary \ref{MinkGeodcomplete}] 
+    In the cartesian coordinate frame for the spatial coordinates, the Minkowski
+    metric, $\eta$, takes the form, $\eta = -\textit{dt}^2 + \textit{dx}^2 +
+    \textit{dy}^2 + \textit{dz}^2$. The Christoffel symbols,
+    $\Gamma^{\sigma}_{\alpha\beta}$, $\alpha, \beta, \sigma = \left\{0, 1, 2,
+    3\right\}$, for this coordinate choice are all identically zero. The geodesic
+    equation for an affinely parameterized curve, $\gamma\left(\tau\right)$,
+    with $\tau$ as the affine parameter, takes the form:
+    \begin{equation*}
+        \frac{d^2 x^\sigma}{d\tau^2} + \Gamma^{\sigma}_{\alpha\beta}\frac{dx^\alpha}{d\tau}\dfrac{dx^\beta}{d\tau} = 0
+    \end{equation*}
+    , which reduces to $\frac{d^2 x^\sigma}{d\tau^2} = 0$. The general solution of
+    such a differential equation is given by $x^{\mu}\left(\tau\right) = A^\mu
+    \tau + B^\mu$, where the constants $A^\mu$ and $B^\mu$ can be determined
+    based on the initial data. We see that $x^\mu\left(\tau\right)$ is linear in
+    the affine parameter and can be extended to any arbitrary value of $\tau$.
+    Since this is true for any arbitrary curve in Minkowski spacetime, this
+    completes our proof.
+\end{proof}
+
+\end{samepage}
+
+\end{document}

@@ -1,0 +1,1292 @@
+\documentclass[11pt, a4paper]{report}
+
+    %\usepackage[utf8]{inputenc}
+    \usepackage[T1]{fontenc}
+    \usepackage[urw-garamond]{mathdesign} %for using math with garamond font
+
+    \usepackage{amsmath} %for cross-referencing math equations
+    %\usepackage{eucal}
+    %\usepackage{amsfonts}
+    \usepackage{bm} %for using bold font letters in inline mathematical expressions
+    \usepackage{graphicx}
+    \usepackage{graphics}
+    \usepackage{subcaption}
+    \usepackage{array}
+    \usepackage{epstopdf}
+    \usepackage{titlesec} %for numbering of subsubsection
+    \usepackage{parskip}
+    \usepackage[symbol]{footmisc} % for using footnote with symbols instead of numbers
+    \usepackage{enumitem} %for enumerations of lists with numbers or alphabets and so on.......
+    \usepackage[margin=2cm, includefoot]{geometry}
+    \usepackage[labelfont={small, bf}, textfont={small, it}]{caption} %used for making the captions in images small and italicized
+
+    % Page Layout
+    \textwidth 165mm    % also can be set to 155mm///// 158mm
+    \textheight 238mm   % standard
+    \topmargin -10mm
+    
+    \oddsidemargin 0.1cm
+    \evensidemargin -0.07cm
+    \graphicspath{ {/images/} }
+    
+    % Stopping Figures from Using a Whole Page
+    \renewcommand{\topfraction}{0.95}
+    \renewcommand{\textfraction}{0.05}
+    \renewcommand{\floatpagefraction}{0.85}
+    \renewcommand{\baselinestretch}{1.5}
+    \renewcommand*\descriptionlabel[1]{\hspace\leftmargin$#1$}
+    \renewcommand{\thefootnote}{\fnsymbol{footnote}} %for using footnotes with symbols rather than numbers
+    \renewcommand{\bibname}{References} %to rename bibliography section to "References"
+
+    \newtheorem{example}{Example}[chapter] %for enumerating examples within a chapter
+
+
+\begin{document}
+
+
+
+%============================================BEGIN TITLE PAGE===============================================
+\begin{titlepage}
+    \begin{center}
+    %syntax for entering line \line(slope){length} double backslash for change of line. For changing
+    %line one can even leave a space. 
+    \line(1,0){300}\\
+    %for increasing the space between the line and the title [spacing]	
+    [0.02in]
+    \large{\emph {A Seminar Course on}}\\	
+    \Huge{\bfseries Wave Simulation}\\
+    \Huge{\bfseries through Hyperbolic PDEs}\\
+    [-0.12in]
+    \line(1,0){300}\\
+    
+    \vspace{0.35in}
+    \normalsize{Authored by}\\
+    
+    \LARGE{\bfseries {Prabha Shankar}}\\
+    
+    \vspace{1.5cm}
+    \normalsize{\emph {Under the supervision of}}\\
+    \large{\bfseries {Leonhard Rannabauer, M.Sc.}}\\
+    \small{(Department of Informatics, TUM)}\\
+    
+\end{center}
+\end{titlepage}
+
+
+
+%=================================================ABSTRACT==================================================
+\begin{titlepage}
+    \pagenumbering{gobble}
+    \begin{center}
+    \bfseries{Abstract}
+    \end{center}
+    \vspace{0.8cm}
+
+    Entities composing the nature constantly alter due to the processes of nature and their interactions with 
+    the other entities. The concept of conservation, an omnipresent phenomena, is therefore the key to understand
+    these processes as it helps in the determination of parameters such as quantity of interacting material, 
+    its velocity, temperature, energy and so forth. This report deals with the nature of connservation laws and by 
+    means of mathematical modelling helps in qualitative understanding of these equations as propagating 
+    waves of disturbances through a medium. Specifically, this report is an endeavor to understand the challenges 
+    that arise when numerically solving Hyperbolic PDEs by throwing light on the discontunuities that arise 
+    in its solution space and brings forth key ideas and techniques to better combat the challenges in their 
+    computational implementations. 
+
+    \end{titlepage}
+
+
+
+
+%=================================TABLE OF CONTENTS AND LIST OF FIGURES=====================================
+\begin{titlepage}
+\pagenumbering{roman}
+\tableofcontents
+\end{titlepage}
+\pagenumbering{goble}
+\listoffigures
+\cleardoublepage
+
+
+
+
+
+
+%==============================================CHAPTER 01===================================================
+\chapter{Introduction to Conservation Laws}
+\pagenumbering{arabic}
+
+%--------------------------------SECTION 1.1-------------------------------------
+\section{Overview}
+The key idea that initiates the concept of conservation laws is balancing the physical systems with respect to
+properties of the entities that are involved in the process. These properties may be mass, charge or even energy. 
+In fluid mechanics, most conservation laws revolve around quantities such as mass, momentum, and energy. These laws
+are imposed on the the entities in a given region in the space where we assume the system is seated at. In several
+cases a \emph{material volume}, whose bounded surface moves with the fluid, might as well be considered. More
+specifically, these systems are referred to as \emph{Control Volume} and their boundaries are called \emph{Control
+Surfaces}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.20\textwidth]{controlvolsurf}
+    \caption{Flow through a control volume}
+    \label{fig:controlvolsurf}
+\end{figure}
+
+
+
+%--------------------------------SECTION 1.2-------------------------------------
+\section{Mathematical Formulation}
+Let us consider the flow of a fluid through a simple control volume, given by $\Omega_x = [x_1, x_2]$ such that $x\in\Omega_x$,
+with the property mass per unit length given by, $\rho(x, t)$ defined along $x$. We observe the system through the
+time $t$ within the temporal domain $\Omega_t = [t_1, t_2]$ such that $t\in\Omega_t$. The total mass is given by:
+
+\begin{equation*}
+    \mathrm{M}(t) = \int_{\Omega_{x}}\rho(x, t)dx
+\end{equation*}
+
+Let $v(x, t) = \frac{dx}{dt}$ be the local velocity of the fluid. Differentiating the equation above with respect
+to time gives:
+\begin{equation*} \label{fm_diff}
+    \frac{d}{dt}\int_{\Omega_{x}}\rho(x, t) dx = \rho\left(x_{1}, t\right) v\left(x_{1}, t\right) - \rho\left(x_{2}, t\right) v\left(x_{2}, t\right)
+\end{equation*}
+Putting it explicitly, under the assumption that there is no accumulation of mass, it is understood that for a 
+given volume to gain mass the inward flux should be higher than the outward flux. It is for that reason the 
+inward flux, $\rho v$ at $x_1$ is higher than the outward flux at $x_2$. Integrating this over temporal domain, 
+we recover:
+\begin{equation} \label{fm_diff_int}
+    \int_{\Omega_{x}} \rho\left(x, t_{2}\right)dx - \int_{\Omega_{x}} \rho\left(x, t_{1}\right)dx = \int_{\Omega_{t}} (\rho\left(x_{1}, t\right) v\left(x_{1}, t\right) - \rho\left(x_{2}, t\right) v\left(x_{2}, t\right))dt 
+\end{equation}
+This equation lays down the fundamental principal of conservation, in this case mass, i.e., mass can neither be 
+created nor can be destroyed by itself.
+
+Moving further, we assume that the density and the velocity are both differentiable at $(x, t)$. The fundamental 
+theorem of calculus leads to the following:
+\begin{equation*}
+    \rho\left(x, t_{2}\right) - \rho\left(x, t_{1}\right) = \frac{d}{dt}\int_{\Omega_{t}}\rho(x, t)dt = \int_{\Omega_{t}}\frac{\partial}{\partial t}\rho(x, t)dt
+\end{equation*}
+
+and, similarly,
+\begin{equation*}
+    \rho\left(x_{2},t\right)v\left(x_{2}, t\right) - \rho\left(x_{1}, t\right)v\left(x_{1}, t\right) = \frac{d}{dx}\int_{\Omega_{x}} \rho(x, t)v(x, t)dx = \int_{\Omega_{x}}\frac{\partial}{\partial x}\rho(x, t)v(x, t)dx
+\end{equation*}
+
+Combining the two immediate results into \eqref{fm_diff_int} yields,
+\begin{equation} \label{fm_consform}
+    \int_{\Omega_{x}}\int_{\Omega_{t}}\left[\frac{\partial \rho(x, t)}{\partial t} + \frac{\partial}{\partial x}(\rho(x, t) v(x, t))\right] dtdx = 0
+\end{equation}
+
+Since \eqref{fm_consform} is applicable on any general $\Omega_x\times\Omega_t$, it must hold pointwise, hence 
+the integrand should be equal to zero. Therefore, the equation to the differential form below:
+\begin{equation*}
+    \frac{\partial \rho(x, t)}{\partial t} + \frac{\partial}{\partial x}(\rho(x, t)v(x, t)) = 0, \quad (x, t)\in\Omega_{x}\times\Omega_{t}
+\end{equation*}
+
+In terms of generalized conserved variable, $u(x, t)$, and the associated flux, $f(u, t)$, the conservation law in 
+integral form yields
+\begin{equation} \label{gen_consform}
+    \int_{\Omega_{x}}u\left(x, t_{2}\right)dx - \int_{\Omega_{x}} u\left(x, t_{1}\right)dx = \int_{\Omega_{t}} (f\left(x_{1}, t\right) - f\left(x_{2}, t\right))dt
+\end{equation} 
+and under the assumption that $u(x, t)$ and $f(u, t)$ are differentiable reduces to the differential form:
+\begin{equation*}
+    \frac{\partial u(x, t)}{\partial t} + \frac{\partial f(u, t)}{\partial x} = 0, \quad (x, t)\in\Omega_{x}\times\Omega_{t}
+\end{equation*}
+This mock-up conservation law which follows from the fundamental principle of conservation discussed above can be
+extended to multiple dimensions. By similar assumptions as in this case, it is understood that change of a given 
+quantity within a fixed volume is the result of its exchange through the boundaries. Mathematically, this can be 
+put as
+\begin{equation*}
+    \frac{d}{dt}\int_{\Omega_{x}}{\bm u}({\bm x}, t)dV = - \oint_{\partial \Omega_{x}} {\bm {\hat{n}}} \cdot {\bm f}({\bm u}, {\bm x}, t)dS, \quad {\bm x}\in\Omega_{x}\subset\mathrm{R}^{d}, t>0
+\end{equation*}
+subjected to appropriate boundary conditions.
+Here, ${\bm {u}}({\bm x}, t):\Omega_{x}\times\Omega_{t}\rightarrow\mathrm{R}^{d}$ is the conserved variable vector, 
+$\bm {\hat {n}}$ is the normal vector pointing outwards of the control surface, denoted by $\partial \Omega_x$ for
+$\Omega_x$, and ${\bm f}({\bm u}, {\bm x}, t) : \mathrm {R}^{m}\times\Omega_{x}\times\Omega_{t} \rightarrow \mathrm {R}^{m}$
+is the flux through the control surface. The parameters in bold face are vectors. This is done to segragate them from
+the scalars in multidimensional space. 
+
+Again, imposing the assumption that the preserved quantity and corresponding 
+flux are both differentiable in the domain, applying Gauss theorem changes the surface integral into volume integral as
+\begin{equation*}
+    \int_{\Omega_{t}}\int_{\Omega_{x}}\left(\frac{\partial}{\partial t}{\bm u}({\bm x}, t) + \nabla\cdot {\bm f}({\bm u}, {\bm x}, t)\right)d{\bm x}dt = 0
+\end{equation*}
+which reduces to the general conservation law in differential form 
+\begin{equation*}
+    \frac {\partial {\bm u}({\bm x}, t)}{\partial t} + {\bm \nabla}\cdot {\bm f}({\bm u}, {\bm x}, t) = 0, \quad {\bm x}\in\Omega_{x}, t>0
+\end{equation*}
+
+
+
+%--------------------------------SECTION 1.3-------------------------------------
+\section{Challenges}
+This mathematical formulation remains the key to model and understand physical processes occuring in the nature. 
+However, there remains several aspects of this formulation that remains a major challenge both computationally and
+mathematically. On mathematical side, the question of uniqueness and existence of solutions due to non-linearity
+remain the major areas of challenge and thereby continue to be active fields of reseach. On computational side, the
+size of the problems is often the most taxing as most physical problems are multidimensional in size. In the next 
+chapters we shall discuss the details of the mathematics involved while modelling such problems by constantly bringing
+simple mathematical examples to provide a more elaborate view on the subject.
+
+
+
+
+
+
+%==============================================CHAPTER 02===================================================
+\chapter{Partial Differential Equations in Conservation Laws}
+Conversation remains a major area of exploration because of its universality. Today we have several physical world
+problem in continuum mechanics, gravitational physics, electromagnetics and so forth that are modelled in this 
+formulation. Prominent examples of these are Navier-Stokes Equation, Euler equations for fluid flow and elasticity,
+Maxwell's equation of electromagnetics, Einstein's Equation, Schr{\"o}dinger's equation and so forth and so on. For
+this reason, this is often a sought after field of research with seemingly non-exhaustive questions. While the 
+discussion in the previous chapter on conservation might seem intuitive, from the stand point of obtaining a 
+solution, a closer look to the problems of conversation speak a different story - one which seems quite challenging 
+and reveals serious underlying challenges to it. 
+
+To be able to understand how this works lets take the simplest problem in conservation and understand ways to obtain
+a solution for the same. Consider the following equation,
+\begin{equation} \label{firstexample}
+    \begin{gathered} %"gathered" used to keep the equations center-aligned; used amsmath package
+        \frac{\partial u}{\partial t} + \frac{\partial au}{\partial x} = 0, \quad x\in\mathrm{R}\\
+        or\\
+        u_t + a{u_x} = 0
+    \end{gathered}
+\end{equation}
+where, $a\in\mathrm{R}$ is a finite constant. Comparing with the standard format of the equation indicates the flux, 
+$f(u) = au$, and this equation is often referred as the scalar one-way wave equation. Imposing an initial condition,
+$u(x,0) = g(x)$, one can quickly verify that the exact solution is 
+\begin{equation*}
+    u(x, t) = g(x - at)    
+\end{equation*}
+The final solution is simply the propagation of the initial condition with a constant speed, $a$. This is the
+reason such equations are often referred to as transport equation. When $a>0$ the solution propagates to the right, 
+while when $a<0$ it propagates to the left. 
+
+This might seem easy, however, there are intricacies to these simple equations, which we are yet to explore. 
+Mathematically, the method to obtain a solution to such PDEs is called {\emph {Method of Characteristics}} and we 
+shall elaborately discuss and build on this idea in the next section to expose the hidden challenges.
+
+%--------------------------------SECTION 2.1-------------------------------------
+\section{Method of Characteristics}
+In this section we discuss the general methodology to solve first-order PDEs. We begin with linear equations and 
+then move through the semilinear, and then quasilinear equations. Most of these discussions are over a single 
+spatial dimension being observed in the defined temporal domain, $t$. However, without loss of generality, we may
+use $y$ instead of $t$ and it should not be confused with a 2D-space.
+
+%---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---
+\subsection{Linear Equations} \label{LinEq_sec}
+Consider the first order equation similar to the one shown in the beginning of this chapter,
+\begin{equation} \label{lineq}
+    a(x, y)u_{x} + b(x, y)u_{y} = c(x, y)
+\end{equation}
+where $u(x, y)$ is the variable whose solution we are interested in. Consider the graph of this function given by
+\begin{equation*}
+    S \equiv \{(x, y, u(x, y))\}
+\end{equation*}
+Condition on $u$ to be a solution for \eqref{lineq}:
+\begin{equation*}
+    (a(x, y), b(x, y), c(x, y))\cdot\left(u_{x}(x, y), u_{y}(x, y), -1\right) = 0
+\end{equation*}
+where, $N(x, y) = \left(u_{x}(x, y), u_{y}(x, y), -1\right)$ is the normal to the surface $S = \{(x, y, u(x, y))\}$ 
+at the point $(x, y, u(x, y))$. Therefore, if vector $(a(x, y), b(x, y), c(x, y)$ is perpendicular to $\left(u_{x}(x, y), u_{y}(x, y), -1\right)$
+at each point of the surface $S$, then the vector $(a(x, y), b(x, y), c(x, y))$ lies in the tangent plane to $S$. 
+Thus, to find a solution to \eqref{lineq}, we look for a surface $S$ such that for each point $(x, y, u(x, y))$ on 
+$S$, the vector $(a(x, y), b(x, y), c(x, y))$ is tangent to the curve. 
+
+To find a solution with above condition, we do the following. Instead of directly finding a surface, we find a curve
+$\mathscr{C}$ and later create the surface as a union of all such curves. Let the curve $\mathscr{C}$ be parametrized
+by $s$ such that at each point on $\mathscr{C}$, the vector $(a(x(s), y(s)), b(x(s), y(s)), c(x(s), y(s)))$ is a 
+tangent to the curve, i.e., the curve $\mathscr{C} = (x(s), y(s), z(s))$ will satisfy the following system of ODEs:
+\begin{equation}
+    \begin{split}
+        \frac{dx}{ds} = a(x(s), y(s))\\
+        \frac{dy}{ds} = b(x(s), y(s))\\
+        \frac{dz}{ds} = c(x(s), y(s))
+    \end{split}
+\end{equation}
+Such curve $\mathscr{C}$ is known as {\bfseries{integral curve}} for the vector field $V = (a(x, y), b(x, y), c(x, y))$. 
+In a PDE of the form \eqref{lineq}, we look for integral curves of the vector field associated with the PDE. In 
+such case, these integral curves are known as the {\bfseries{characteristic curves}}. The best feature of this 
+method is that it breaks down a PDE into a set of ODEs called as the set of {\bfseries{characteristic equations}} 
+which are easier to deal with. We shall look into the example to get a better grasp of this.
+
+\begin{center}
+    \begin{figure}[h]
+         \begin{subfigure}{0.5\textwidth}
+            \includegraphics[width=1.0\linewidth, height=6cm]{solutionspace} 
+        \end{subfigure}
+        \begin{subfigure}{0.5\textwidth}
+            \includegraphics[width=1.0\linewidth, height=6cm]{integralcurve}
+        \end{subfigure}
+         
+        \caption{Solution space (left) and integral curve (right) for a general PDE of linear form}
+        \label{fig:linearpdesolution}
+    \end{figure}
+\end{center}
+
+
+
+\begin{example}
+    \normalfont Using the method of characteristics discussed above, find a solution to Equation \eqref{firstexample}. 
+\end{example}
+
+With the assumption that the space is parametrized by $s$, we can write
+\begin{equation} \label{sampleCharODEs}
+    \begin{split}
+        \frac{dx}{ds} = a\\
+        \frac{dt}{ds} = 1\\
+        \frac{dz}{ds} = 0
+    \end{split}
+\end{equation}
+
+Solving the above system of ODEs, we get
+\begin{equation*}
+    \begin{aligned} %flalign to align the equations to the left
+        & x(s) = as + c_{1}\\[-0.5em] % '&' is necessary here for the alignment to appear
+        & t(s) = s + c_{2}\\[-0.5em]
+        & z(s) = c_{3}
+    \end{aligned}
+\end{equation*}
+
+Eliminating the parameter $s$, we observe these curves are line in $\mathbb{R}^{3}$ given by $x_{0} = x - at$
+$z = k$ for the constants $x_0$ and $k$. Here, $S$ is the integral curve formed by union of these characteristic
+curves. Looking at the solution, we can say that $z$ is constant along $x_0 = x - at$, i.e., $z(x, t) = f(x-at)$. 
+Thus, for any smooth function $f$ we have found a general solution for \eqref{lineq} and written as $u(x,t) = 
+z(x,t) = f(x - at)$. For cross-reference, an application of chain rule over the solution does show that it satifies
+the PDE as shown
+\begin{equation*}
+    u_{t} + au_{x} = -af^{\prime}(x - at) + af^{\prime}(x - at) = 0
+\end{equation*}
+
+\begin{center}
+    \line(1,0){100}
+\end{center}
+
+
+Let us note down some remarks here,
+\begin{itemize}
+    \item The solution of the above equation is constant along the lines $x = x_0 + at$, also known as {\bfseries 
+    projected characteristics curves}, i.e., the initial condition for every value of $x$ is projected in time along 
+    the lines which take the equation of the characteristics curves. As referred before, this is the reason the
+    equation is often called {\bfseries Transport Equation}. Refer figure \ref{fig:characteristiccurves}.
+    
+    \item  Moving along a characteristics originating at a given $x_0$, i.e., the initial value, one would find the 
+    value of $u(x,t)$ to be constant at every point. 
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.40\textwidth]{characteristiccurves}
+    \caption{Characteristic curves for a transport equation with constant wave velocity, $a$ (in this case $a=2$)}
+    \label{fig:characteristiccurves}
+\end{figure}
+
+Generalizing thus, assume we have an initial value transport equation of the form:
+\begin{equation}
+    \begin{cases}
+        \; u_t + a{u_x} = 0\\[-0.5em] % use \quad as spacer between equation and brace
+        \; u(x, 0) = \phi(0)
+    \end{cases}
+\end{equation}
+Assume, we know nothing about the above example whereby $\phi(x-at)$ would be the solution of the problem. In such a 
+case, the idea would go back to the theory of method of characteristics in which we calculate the solution by constructing
+an integral surface as a union of the characteristic curves except with the imposition that it contains a curve $\{(x, 0, 
+\phi(x))\}$. Geometrically, this would mean that $\Gamma\equiv\{(x, 0)\}$ in $\mathbb{R}^{2}$ is the curve on which we are
+prescribing our data such that $(\Gamma, \phi)$  a curve in $\mathbb{R}^{3}$ given by $\{(x, 0, \phi(x))\}$. We begin to
+construct a solution emanating from point $\{(x_0, 0, \phi(x_0))\}$ on $(\Gamma, \phi)$ based on the set of characteristic 
+ODEs \eqref{sampleCharODEs} with the following initial condition:
+\begin{equation*}
+    \begin{aligned} %flalign to align the equations to the left
+        & x(0) = x_0\\[-0.5em] % '&' is necessary here for the alignment to appear
+        & t(0) = 0\\[-0.5em]
+        & z(0) = \phi(x_0)
+    \end{aligned}
+\end{equation*}
+
+By similar logic as discussed above, constructing a characteristic curve from each point of $(\Gamma, \phi)$ and taking
+the union of all such curves will yield us the integral surface $S$ for which the vector field $(a, 1, 0)$ lies in the
+tangent space. This would be the solution for the PDE. 
+To solve this algebraically, let us parametrize the curve $(\Gamma, \phi)$. We parametrize $\Gamma$ by $r$ such that $
+\Gamma = \{(r, 0)\}$. Now for each $r$, we need to solve the following system
+\begin{equation*}
+    \begin{aligned}
+        & \frac {dx}{ds}(r, s) = a\\
+        & \frac {dt}{ds}(r, s) = 1\\
+        & \frac {dz}{ds}(r, s) = 0
+    \end{aligned}
+\end{equation*}
+
+with the parametrized initial conditions
+\begin{equation*}
+    \begin{aligned}
+        & x(r,0) = r\\[-0.5em]
+        & t(r, 0) = 0\\[-0.5em]
+        & z(r, 0) = \phi(r)
+    \end{aligned}
+\end{equation*}
+
+Integrating the characteristic ODEs with respect to $s$, we get
+\begin{equation*}
+    \begin{aligned}
+        & x(r,s) = as + c_1(r)\\[-0.5em]
+        & t(r, s) = s + c_2(r)\\[-0.5em]
+        & z(r, s) = c_3(r)
+    \end{aligned}
+\end{equation*}
+
+Substituting the initial conditions yields,
+\begin{equation*}
+    \begin{aligned}
+        & x(r,0) = c_1(r) = r\\[-0.5em]
+        & t(r, 0) = c_2(r) = 0\\[-0.5em]
+        & z(r, 0) = c_3(r) = \phi(r)
+    \end{aligned}
+\end{equation*}
+
+Hence the solution reduces to
+\begin{equation*}
+    \begin{aligned}
+        & x(r,s) = as + r\\[-0.5em]
+        & t(r, s) = s\\[-0.5em]
+        & z(r, s) = \phi(r)
+    \end{aligned}
+\end{equation*}
+
+Solving for $r$, $s$ in terms of $x$, $t$, we get:
+\begin{equation*}
+    \begin{aligned}
+        & r(x, t) = x - at\\[-0.5em]
+        & s(x, t) = t
+    \end{aligned}
+\end{equation*}
+
+Thus the solution $z(r, s)$ can be expressed in terms of $(x, t)$ as $z(r(x,t), s(x,t))$ as
+\begin{equation*}
+    u(x, t) = z(r(x, t), s(x, t)) = \phi(x - at)
+\end{equation*}
+Given the experience from the previous example, this would be our predicted solution. We will now move
+to the next sub-topic and build up on these ideas. 
+
+%---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---
+\subsection{Cauchy Problems and idea behind non-characteristics boundary data} \label{cauchyandnoncharacteristic}
+In the previous section we dealt with problem types where data along a given curve $\Gamma$, i.e., the 
+initial value, are specified and it is realized that the solution is simply the propagation of that curve
+with a constant speed along the characteristics. Now putting in form of a question, is it possible to 
+specify a data on any curve $\Gamma$ in the $xt-$plane and work with the problem? Is the problem an 
+ill-posed one? Let us explore the idea. 
+
+Consider a problem: 
+\begin{equation} \label{CauchyProbSample}
+    \begin{cases}
+        \; u_t + a{u_x} = 0\\[-0.5em]% use \quad as spacer between equation and brace
+        \; u|_\Gamma = \phi
+    \end{cases}
+\end{equation}
+where $\Gamma$ is a curve in $xt$-plane. Problem like equation \eqref{CauchyProbSample} are known as {\bfseries 
+Cauchy Problem}. The curve $\Gamma = \{(x,t): x-at = 0\}$ in $xt$-plane be parametrized by $r$ such that 
+$\Gamma = \{(r, ar)\}$. Recalling from the discussion in the section \ref{LinEq_sec} the solution along the 
+projected characteristic curves $\{(x, t): x - at = C\}$. However, when we prescribe data on one of these 
+characteristic curve like in this case, two problems arise:
+\begin{itemize}
+    \item As the solution must be constant along these projected characteristics, prescribing a data along
+    $x-at = 0$ such that $u|_\Gamma = \phi$, would imply $\phi$ to be constant.
+
+    \item There would not be sufficient data to determine the value of $u$ at points off this characteristic
+    curve on which we are prescribing the data.
+\end{itemize}
+Therefore, the problem is clearly an ill-posed one because to find an integral surface we need to draw
+characteristics emanating from each of the point of $(x, t, \phi(x, t))$ for each $(x, t)\in\Gamma$. To 
+do so, a constraint needs to be imposed on the curve $\Gamma$ such that it is nowhere tangent to the vector
+field associated with the PDE, in this case $(a, 1)$. If $\Gamma$ satisfies the condition, we say $\Gamma$
+is {\emph{\bfseries noncharacteristic boundary data}}.
+
+Mathematically, if $\Gamma$ is noncharacteristic for the Cauchy problem
+\begin{equation*}
+    \begin{cases}
+        \; a(x,y)u_x + b(x,y)u_y = c(x, y)\\[-0.5em] % use \quad as spacer between equation and brace
+        \; u|_\Gamma = \phi
+    \end{cases}
+\end{equation*}
+implies $\Gamma$ is nowhere tangent to the projected characteristics $\left(a\left(\gamma_{1}(r), 
+\gamma_{2}(r)\right), b\left(\gamma_{1}(r), \gamma_{2}(r)\right)\right)$, which can be expressed mathematically
+as,
+\begin{equation} \label{noncharacteristic}
+    (a\left(\gamma_{1}(r), \gamma_{2}(r)\right), b\left(\gamma_{1}(r), \gamma_{2}(r)\right))\cdot\left(-\gamma_{2}^{\prime}(r), \gamma_{1}^{\prime}(r)\right) \neq 0
+\end{equation}
+As long as $\Gamma$ is a noncharacteristic, we can find a unique solution to our Cauchy problem. 
+
+Remembering that we solve equation \eqref{CauchyProbSample} by constructing an integral surface $S$ as a union
+of the characteristic curves that are tangent to the vector field associated to the PDE, in this case is 
+$V = (a(x, y), b(x, y), c(x, y))$. Thus the solution is solving by the following ODEs:
+\begin{equation*}
+    \begin{aligned}
+        & \frac {dx}{ds}(r, s) = a(x, y)\\
+        & \frac {dy}{ds}(r, s) = b(x, y)\\
+        & \frac {dz}{ds}(r, s) = c(x, y)
+    \end{aligned}
+\end{equation*}
+ with the initial conditions, 
+\begin{equation*}
+    \begin{aligned}
+        & x(r, 0) = \gamma_{1}(r)\\[-0.5em]
+        & y(r, 0) = \gamma_{2}(r)\\[-0.5em]
+        & z(r, 0) = \phi(r)
+    \end{aligned}
+\end{equation*}
+A solution thus obtained is unique and is as following
+\begin{equation*}
+    \begin{aligned}
+        & x = x(r, s)\\[-0.5em]
+        & y = y(r, s)\\[-0.5em]
+        & z = z(r, s)
+    \end{aligned}
+\end{equation*}
+The solution can be written as $z(r, s) = z(x(r, s), y(r, s))$. If we are able to find a function $H$ such that
+$(r, s) = H(x, y)$, then we can obtain a unique solution to the above equation, i.e.,
+\begin{equation*}
+    u(x, y) = z(r, s) = z(H(x, y))
+\end{equation*} 
+This is more like a transformation from one coordinate to the other. To build on this idea would require an
+introduction to two key ideas, first, Jacobi function and second, Inverse function theorem. 
+
+{\bfseries Jacobi function:} Let $G:U\subset\mathbb{R}^{n} \rightarrow \mathbb{R}^{n}$ be a $C^1$ function. Thus, 
+$G = \{u_1, u_2,\ldots,u_n\}$ are the components of $G$. The Jacobian of $G$ at a point $\vec{x_0}\in\mathbb{R}^{n}$ is
+given by,
+\begin{equation*}
+    JG(x_0) = \left[\begin{array}{ c c c c }{{\frac{\partial u_1}{\partial x_1}}\left(\vec{x}_{0}\right) } & {{\frac{\partial u_1}{\partial x_2}}\left(\vec{x}_{0}\right)} & {\dots} & {{\frac{\partial u_1}{\partial x_n}}\left(\vec{x}_{0}\right)} \\ 
+    {{\frac{\partial u_2}{\partial x_1}}\left(\vec{x}_{0}\right)} & {{\frac{\partial u_2}{\partial x_2}}\left(\vec{x}_{0}\right)} & {\dots} & {{\frac{\partial u_2}{\partial x_n}}\left(\vec{x}_{0}\right)} \\ 
+    {\vdots} & {\vdots} & {\ddots} & {\vdots} \\ 
+    {{\frac{\partial u_n}{\partial x_1}}\left(\vec{x}_{0}\right)} & {{\frac{\partial u_n}{\partial x_1}}\left(\vec{x}_{0}\right)} & {\dots} & {{\frac{\partial u_n}{\partial x_n}}\left(\vec{x}_{0}\right)} \end{array}\right]    
+\end{equation*}
+
+{\bfseries Inverse Theorem Function:} Continuing from the above definition of Jacobi, assume $JG(\vec{x_0})\neq0$. Then,
+there exists an open set $V\subset U$ with $\vec{x_0}\in V$ and an open set $W\subset \mathbb{R}^{n}$, with 
+$\vec{z_0} = G(\vec{x_0})\in W$ such that $G:V\rightarrow W$ is a one-to-one and onto, and the inverse function  
+is $C^1$.
+Now we try to see how  the condition of noncharacteristic suffices for a unique local solution. We present the claim
+first and then go ahead to justify the same with an analytical proof.
+
+{\bfseries Claim:} {\emph{If $\Gamma$ is a noncharacteristic, we can find a local inverse of the function $G(r,s) = (x(r, s), y(r, s))$
+near $s=0$. That is, for each $r_0$ we can find an open set $V$ containing the point $(r_0, 0)$ and an open set $W$ 
+containing the point $G(r_0, 0) = (x(r_0, 0), y(r_0, 0)) = (\gamma_1(r_0), \gamma_2(r_0))$, such that $G:V\rightarrow W$
+is one-to-one and onto, and the inverse function $G^{-1}:W\rightarrow V$ is $C^1$.}}
+
+{\bfseries Proof:} We use Inverse function theorem to prove the above claim. Begin by fixing $(r_0, 0)$. From
+the stated definition of $G(r,s)$, we can say that 
+\begin{equation*}
+    \begin{split}
+        JG(r,s) & = \operatorname{det} \left[\begin{array}{ l l }{x_{r}(r,s)} & {x_{s}(r, s)} \\ 
+        {y_{r}(r, s)} & {y_{s}(r, s)}\end{array}\right] \\
+        & = x_{r}y_{s} - x_{s}y_{r}
+    \end{split}
+\end{equation*}
+At each point $(r_0, 0)$, 
+\begin{equation*}
+    JG(r_0, 0) = x_{r}(r_0, 0)y_{s}(r_0, 0) - x_{s}(r_0, 0)y_{r}(r_0, 0)
+\end{equation*}
+
+Since $x(r,s), y(r,s)$ satisfy the characteristic ODEs, therefore, for each $r$,
+\begin{equation*}
+    \begin{aligned}
+        & x_{s}(r, s) = a(x(r, s), y(r, s)) \\[-0.5em]
+        & y_{s}(r, s) = b(x(r, s), y(r, s))
+    \end{aligned}
+\end{equation*}
+which again implies,
+\begin{equation*}
+    \begin{aligned}
+        & x_{s}(r_0, 0) = a(x(r_0, 0), y(r_0, 0)) = a(\gamma_1(r_0), \gamma_2(r_0)) \\[-0.5em]
+        & y_{s}(r_0, 0) = b(x(r_0, 0), y(r_0, 0)) = b(\gamma_1(r_0), \gamma_2(r_0)) 
+    \end{aligned}
+\end{equation*}
+
+Further,
+\begin{equation*}
+    \begin{aligned}
+        & x_{r}\left(r_{0}, 0\right) = \gamma_{1}^{\prime}\left(r_{0}\right) \\[-0.5em]
+        & y_{r}\left(r_{0}, 0\right) = \gamma_{2}^{\prime}\left(r_{0}\right) 
+    \end{aligned}
+\end{equation*}
+
+Combining the above two results into the $JG(x_0, 0)$, we get
+\begin{equation*}
+    \begin{split}
+        JG\left(r_{0}, 0\right) & = \gamma_{1}^{\prime}\left(r_{0}\right)b\left(\gamma_{1}\left(r_{0}\right), \gamma_{2}\left(r_{0}\right)\right) - \gamma_{2}^{\prime}\left(r_{0}\right) a\left(\gamma_{1}\left(r_{0}\right), \gamma_{2}\left(r_{0}\right)\right) \\
+            & = \left(a\left(\gamma_{1}(r), \gamma_{2}(r)\right), b\left(\gamma_{1}(r), \gamma_{2}(r) \right)\right) \cdot \left(-\gamma_{2}^{\prime}(r), \gamma_{1}^{\prime}(r)\right) \\
+    \end{split}
+\end{equation*}
+Here we invoke Inverse function theorem according to which as long as $G(r_0, 0)\neq 0$ we can find an inverse
+of $G$ near $x_0$. Recalling the condition on $\Gamma$ we see that $G(r_0, 0)$ implies that $\Gamma$ is 
+noncharacteristic. Therefore, as long $\Gamma$ is a noncharacteristic, we can find an inverse of $G(r, s)$ and 
+thereby a unique solution to the PDE. 
+
+This concludes our discussion on Cauchy problems and the existence of solution for noncharacteristic boundary
+data.
+
+%---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---
+\subsection{Semilinear Equation}
+The general nature of a Cauchy problem of semi-linear equation remains the same in comparison to the one in the
+previous section with a slight change as shown,
+it as shown,
+\begin{equation*}
+    \begin{cases}
+        \; a(x,y)u_x + b(x,y)u_y = c(x, y, u)\\[-0.5em] % use \quad as spacer between equation and brace
+        \; u|_\Gamma = \phi
+    \end{cases}
+\end{equation*}
+namely, the right hand side of the PDE is now a function of $u$ as well. The initial condition remains the same. 
+However, one the characteristic ODEs have to be changed accordingly, more explicity,
+\begin{equation*}
+    \frac {dz}{ds}(r, s) = c(x, y, u) 
+\end{equation*}
+Using the procedure discussed in the section \ref{cauchyandnoncharacteristic} and under the condition that $\Gamma$ 
+is a noncharacteristic, in the vicinity of $\Gamma$, one can solve the PDE to obtain a unique solution of the form
+\begin{equation*}
+    u(x, y) = z(r(x, y), s(x, y))
+\end{equation*}
+We would now move to the key sections in this discussion on method of characteristics pertinent to Hyperbolic PDEs 
+from wave simulation standpoint. These are extremely significant in understanding of how the nature of PDEs impact 
+the associated solution. 
+
+%---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---
+\subsection{Quasilinear Equation}
+Often processes or phenonmena in nature have a discontinuity. The jump or discontinuity occur in processes such as 
+an explosion or sonic boon, or shock waves in hypersonic vehicles and so forth. Hyperbolic equations wonderfully 
+capture these discontinuities and through very simplistic models explain the reason for the behavior of the phenomenon. 
+In this section we shall discuss about quasilinear equations that aid in our understanding of phenomena with such
+discontinuities. 
+
+Again, in comparison to the previous section very little change occur to the PDEs but the effects that they have on
+the overall behaviour is considerable. This is a proof for how complicated a very simple looking PDE can be.
+
+Proceeding ahead, consider the following problem,
+\begin{equation*}
+    \begin{cases}
+        \; a(x, y, u)u_x + b(x, y, u)u_y = c(x, y, u)\\[-0.5em] % use \quad as spacer between equation and brace
+        \; u|_\Gamma = \phi
+    \end{cases}
+\end{equation*}
+Parametrizing $\Gamma$ by $r$ such that $\Gamma = \{(\gamma_1(r), \gamma_2(r))\}$. The characteristic ODEs are:
+\begin{equation*}
+    \begin{aligned}
+        & \frac {dx}{ds}(r, s) = a(x, y, u)\\
+        & \frac {dy}{ds}(r, s) = b(x, y, u)\\
+        & \frac {dz}{ds}(r, s) = c(x, y, u)
+    \end{aligned}
+\end{equation*}
+
+and the initial conditions are,
+\begin{equation*}
+    \begin{aligned}
+        & x(r, 0) = \gamma_{1}(r)\\[-0.5em]
+        & y(r, 0) = \gamma_{2}(r)\\[-0.5em]
+        & z(r, 0) = \phi(r)
+    \end{aligned}
+\end{equation*}
+Again, as long as we are able to the invert the function $G\equiv \{(x(r, s), y(r, s))\}$ (at least near $s = 0$)
+we can find a solution to the above PDE of the type
+\begin{equation*}
+    u(x, y) = u(x(r, s), y(r, s))
+\end{equation*}
+Also, as from the claim in the section \ref{cauchyandnoncharacteristic}, $G$ is invertible provide $\Gamma$ is a
+noncharacteristic, i.e., $\Gamma$ is no where tangent to the projected characteristic curves, which can be represented
+mathematically as,
+\begin{equation} \label{modifiedcondition}
+    \left(a\left(\gamma_{1}(r), \gamma_{2}(r), \phi(r)\right), b\left(\gamma_{1}(r), \gamma_{2}(r), \phi(r)\right)\right) \cdot \left(-\gamma_{2}^{\prime}(r), \gamma_{1}^{\prime}(r)\right) \neq 0
+\end{equation}
+It is important to point that the projected curves now depend on $z$ as well and that the condition for noncharacteristic
+depends on both $\Gamma$ and $\phi$. Similar to discussion before, $(\Gamma, \phi)$ are together called {\emph{\bfseries
+noncharacteristic boundary data}} if it satisfies the condition in equation \eqref{modifiedcondition}.
+
+%---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---sub---
+\subsection{Burgers' Equation and nature of solution}
+Proceeding ahead we shall see an example of quasilinear called Burgers' equation to understand what causes the 
+jump in the solution. 
+
+Consider the initial value problem , also known as Burgers' Equation, given by
+\begin{equation} \label{burgereq}
+    \begin{cases}
+        \; u_t + uu_x = 0\\[-0.5em] % use \quad as spacer between equation and brace
+        \; u(x, 0) = \phi(x)
+    \end{cases}
+\end{equation}
+We parametrize $\Gamma$ with $r$ such that $\Gamma = \{(r,0)\}$. Also, $\gamma_1{\prime}(r) = 1$ and $\gamma_2{\prime}(r) = 0$.
+From this we realize that $\Gamma$ is indeed the noncharacteristic since,
+\begin{equation*}
+    \gamma_{1}^{\prime}(r) - \gamma_{2}^{\prime}(r)\phi(r) \neq 0
+\end{equation*}
+
+The characteristic ODE set is given by:
+\begin{equation*}
+    \begin{aligned}
+        & \frac{dt}{ds} = 1\\
+        & \frac{dx}{ds} = z\\
+        & \frac{dz}{ds} = 0    
+    \end{aligned}
+\end{equation*}
+
+with the initial conditions,
+\begin{equation*}
+    \begin{aligned}
+        & t(r, 0) = 0\\[-0.5em]
+        & x(r, 0) = r\\[-0.5em]
+        & z(r, 0) = \phi(r)
+    \end{aligned}
+\end{equation*}
+
+Solving this system of equation, we get:
+\begin{equation*}\
+    \begin{aligned}
+        & t(r,s) = s + c_1(r)\\[-0.5em]
+        & z(r,s) = c_3(r)\\[-0.5em]
+        & x(r,s) = c_3(r)s + c_2(r)
+    \end{aligned}
+\end{equation*}
+
+Now, using initial conditions we have,
+\begin{equation*}\
+    \begin{aligned}
+        & t(r,s) = s\\[-0.5em]
+        & z(r,s) = \phi(r)\\[-0.5em]
+        & x(r,s) = \phi(r)s + r
+    \end{aligned}
+\end{equation*}
+Finding $r$ in terms of $(x, t)$, we get: $r = x - zt$. Therefore, letting $u(x,t) = z(r, s)$, we have:
+\begin{equation*}
+    u(x, t) = z(r, s) = \phi(x-ut)
+\end{equation*}
+an implicit formula for a solution to Burgers' equation \eqref{burgereq}.
+
+\subsubsection{Breakdown of continuity of solution\textemdash a discussion of result above} 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics{characteristicintersect}
+    \caption{Intersection of characteristics curves for Burgers' equation when $\phi^{\prime}(r)$}
+    \label{fig:characteristicintersect}
+\end{figure}
+
+We see above that the solution for above is $u(x, t) = \phi(x-ut)$. Let us have  a look at the characteristic
+curves given by $x = \phi(r)s + r$ and $t = s$ implying $x = \phi(r)t + r$. Now consider the following scenario
+shown in the figure \ref{fig:characteristicintersect}: assume for some initial value along $\phi$ such that for 
+$r_1 < r_2$ we have $\phi(r_1) > \phi(r_2)$. This would marching ahead in time the curves would meet at some 
+$(x_0, t_0)$. Is this problem? Let's see. We see that $\frac{du}{ds} = 0$. This means that the solution is constant 
+along a given characteristic curve. That is to say, starting from a given initial data, $u$ continuous to take
+the same value along a given characteristic curve. According to our scenario here, 
+$u(x_0, t_0) = u(r_1, 0) = \phi(r_1)$. But also, $u(x_0, t_0) = u(r_2, 0) = \phi(r_2)$. However, our assumption 
+states $\phi_1 > \phi_2$. We got a contradiction and therefore, we get a singularity formation at some time $t_0$. 
+Thus, whenever a function is decreasing, i.e., $\phi^{\prime}(x)<0$, we shall see this contradiction. Graphically,
+as shown in the picture below, assuming rightwards is the direction of increasing $r$, the wave on the left would 
+try to take over the wave on the right, thereby trying to attain multiple values at the same location. Consequently, 
+it cannot be the solution of the equation after time $t_0$. 
+
+However, $\phi^{\prime}(r)>0$ is not a problem, as the characteristics won't intersect in this case and a smooth 
+continuous solution is at our dispense. However, it is often not enough information to define $u$. Under such a
+circumstance, the solution has time reversibility issues or issues when the velocity of waves changes its sign
+\textemdash an effect similar to time reversibility.
+
+
+\section{Type of Problems based on Conservation Principles}
+With the detailed mathematical analysis of the Quasilinear case, there is some insight to why discontinuities 
+arise in the PDEs of such nature. Hyperbolic PDEs also have a similar nature but before we define them mathematically,
+here is an example from a real physical processes that numerically show discontinuity under certain initial conditions.
+
+\subsection{Euler Equation}
+Euler equations of Gas Dynamics on mass and momentum conservation are one of the most sought after topic of research. 
+The equations are given by:
+\begin{equation*}
+    \frac{\partial \rho}{\partial t} + \nabla\cdot (\rho \bm{v}) = 0, \qquad \frac{ \partial \rho \bm{v}}{\partial t} + \nabla \cdot \bm{f}(\bm{v}) = 0
+\end{equation*}
+where, the density is given by, $\rho = \rho(\bm{x}, t)$, the momentum is given by, $\rho \bm{v} = \rho(\bm{x}, t)\bm{v}(\bm{x}, t)$
+and, the nonlinear flux,
+\begin{gather*}
+        \bm{f}(\bm{v}) = \left[\bm{f}_{1}(\bm{v}), \bm{f}_{2}(\bm{v}), \bm{f}_{3}(\bm{v})\right]\\
+        \bm{f}_{i}(\bm{v}) = \left[\rho v_{1}v_{i} + \delta_{i1}p, \rho v_{2}v_{i} + \delta_{i2}p, \rho v_{3}v_{i} + \delta_{i3}p\right]
+\end{gather*}
+where, $p = p(\bm{x}, t)$ is the pressure.
+
+To imply a conservation of energy, we bring in a third equation given by:
+\begin{equation*}
+    \frac{\partial E}{\partial t} + \nabla \cdot [(E + p)v] = 0
+\end{equation*}
+Combining the equations above, we get the simplified conservation equation given by:
+\begin{equation*}
+    \frac{\partial \bm{q}}{\partial t} + \nabla \cdot \bm{f}(\bm{q}) = 0
+\end{equation*}
+where,
+\begin{gather*}
+    \bm{q} = \left[\rho, \rho v_{1}, \rho v_{2}, \rho v_{3}, E\right]^{T}, \qquad \bm{f}(\bm{q}) = \left[\bm{f}_{1}(\bm{q}), \bm{f}_{2}(\bm{q}), \bm{f}_{3}(\bm{q})\right],\\
+    \bm{f}_i(\bm{q}) = \left[\rho v_{i}, \rho v_{1}v_{i} + \delta_{i1}p, \rho v_{2}v_{i} + \delta_{i2}p, \rho v_{3}v_{i} + \delta_{i3}p, v_{i}(E + p)\right]^{T}
+\end{gather*}
+The above equations are finally closed by thermodynamic relation of an ideal gas \textemdash one that relates the
+density to the pressure of the gas. A similar simplied equation in one-dimensional form is given by,
+\begin{equation*}
+    p = (\gamma - 1)\left(E -\frac{1}{2} \rho u^{2}\right), \qquad c = \sqrt{\frac{\gamma p}{\rho}}
+\end{equation*}
+where $c$ is the local speed of sound and $\gamma$ is a fluid dependent constant (usually $7/5$ for an ideal gas).
+
+The coupling of the equations due to inherent nonlinearity comes as a major challenge to solving these equations 
+even with the current day computational techniques. The equations causes formation of propagating waves and under
+certain flow conditions also give rise to discontinuity, often referred to as a shock, that are again challenging
+from the conservation standpoint. A numerical example for such a Eulers problem with discontinuity is called the 
+Sod's Shock Tube problem shown below defined on the domain $x\in[0,1]$:
+\begin{equation*}
+    \rho(x , 0) = \left\{\begin{array}{ l l }{1.000, } & \quad {x < 0.5 , } \\ {0.125 , } & \quad {x \geq 0.5, }\end{array} \qquad \rho u(x, 0) = 0, \qquad E(x , 0) = \frac{1}{\gamma - 1} \left\{\begin{array}{ l l }{1.0 , } & {x < 0.5} \\ { 0.1 , } &  x \geq 0.5}\end{array}
+\end{equation*}
+
+\begin{center}
+    \begin{figure}[h]
+         \begin{subfigure}{0.33\textwidth}
+            \includegraphics[width=1.0\linewidth, height=4.5cm]{sod_den} 
+            \caption{Density $\rho$}
+            \label{fig:sod_den}
+        \end{subfigure}
+        \begin{subfigure}{0.33\textwidth}
+            \includegraphics[width=1.0\linewidth, height=4.5cm]{sod_vel}
+            \caption{Velocity $u$}
+            \label{fig:sod_vel}
+        \end{subfigure}
+        \begin{subfigure}{0.33\textwidth}
+            \includegraphics[width=1.0\linewidth, height=4.5cm]{sod_press}
+            \caption{Pressure $p$}
+            \label{fig:sod_press}
+        \end{subfigure}
+         
+        \caption{Solution to the Sod's Shock Tube Problem at $T=0.20$: Density, Velocity and Pressure profiles illustrated here}
+        \label{fig:sodproblem}
+    \end{figure}
+\end{center}
+
+It is assumed that any disturbance stays away form the boundary of the domain. The solution to the problem is plotted
+at time $T=0.2$. We realize at several discontinuities in the profiles with a shock at $x \simeq 0.850$ as seen in figure
+\ref{fig:sodproblem} (a discontinuity seen across all the profiles at that $x-$ value). Often, the discontinuities seen 
+in these problems are high-frequency smooth ones. Such discontinuities are often more difficult to resolve making it
+computationally more challenging. An example to one such problem is the shock-entropy problem with the following 
+initial condition:
+\begin{equation*}
+    \left[\begin{array}{c} {\rho} \\ {u} \\ {p} \end{array}\right] = \begin{cases}
+        \; 3.857143, & \\[-0.7em]
+        \; 2.629369, & \quad x < -4.0 \\[-0.7em]
+        \; 10.33333, & \\[0.5em]
+        \; 1 + 0.2 \sin(\pi x), & \\[-0.7em]
+        \; 0, & \quad x \geq -4.0 \\[-0.7em]
+        \; 1, & \\
+    \end{cases}
+\end{equation*}
+For the above problem, the domain $x\in[-5,5]$. Figure \ref{fig:shockentropy} shows the solution for the same at 
+$T = 1.80$.
+
+\begin{center}
+    \begin{figure}[h]
+         \begin{subfigure}{0.33\textwidth}
+            \includegraphics[width=1.0\linewidth, height=4.5cm]{SE_den} 
+            \caption{Density $\rho$}
+            \label{fig:SE_den}
+        \end{subfigure}
+        \begin{subfigure}{0.33\textwidth}
+            \includegraphics[width=1.0\linewidth, height=4.5cm]{SE_vel}
+            \caption{Velocity $u$}
+            \label{fig:SE_vel}
+        \end{subfigure}
+        \begin{subfigure}{0.33\textwidth}
+            \includegraphics[width=1.0\linewidth, height=4.5cm]{SE_press}
+            \caption{Pressure $p$}
+            \label{fig:SE_press}
+        \end{subfigure}
+         
+        \caption{Solution to Shock-Entropy Problem at $T=1.80$: Density, Velocity and Pressure profiles illustrated here}
+        \label{fig:shockentropy}
+    \end{figure}
+\end{center}
+
+\section{Hyperbolic PDEs}
+Having rigorously worked with PDEs, methods for solving them and analysing the nature of solutions, we see what is 
+the formal definition of Hyperbolic PDEs. 
+
+Let $U:\mathbb{R}^{n}\times(0, \infty)\rightarrow\mathbb{R}^{m}$. Let $A_i()x, t$ be a $m\times m$ matrix for $i = 1,
+2, \cdots, n$. Let $F:\mathbb{R}^{n}\times(0, \infty)\rightarrow\mathbb{R}^{m}$. Consider the system of equations given
+by,
+\begin{equation} \label{hyPDE}
+    U_{t} + \sum_{i = 1}^{n}A_{i}(x, t)U_{x_{i}} = F(x, t)
+\end{equation}
+Fix $\xi \in \mathbb{R}^{n}$. Let,
+\begin{equation*}
+    A(x, t; \xi)\equiv\sum_{i = 1}^{n}A_{i}(x, t)\xi_{i}
+\end{equation*} 
+
+Then, the system of equations \eqref{hyPDE} is {\bfseries Hyperbolic} if $A(x, t; \xi)$ is diagonizable for all $x,
+\xi \in \mathbb{R}^{n}, t>0$. Particularly for such a system, for all $x,\xi \in \mathbb{R}^{n}, t>0$ the matrix $A(x,
+ t; \xi)$ has $m$ real eigenvalues
+ \begin{equation*}
+    \lambda_{1}(x, t; \xi) \leq \lambda_{2}(x, t; \xi) \leq \ldots \leq \lambda_{m}(x, t;\xi)
+ \end{equation*}
+with $\left\{r_{i}(x, t; \xi )\right\}_{i = 1}^{m}$ as the corresponding eigenvectors that form a basis for $\mathbb{R}
+^{m}$
+
+There are two categories of hyperbolicity to complete the definition of Hyperbolic PDEs. They are:
+\begin{itemize}
+    \item If $A_{i}(x,t)$ is symmetric for $i = 1, 2, \cdots, n$. then $A(x, t; \xi)$ is symmetric for all $\xi \in 
+    \mathbb{R}^{n}$. Also recalling that a symmetric matrix as mentioned here is diagonalizable. For the case when
+    the matrices $A_{i}(x, t)$ are all symmetric, we say that the system \eqref{hyPDE} is {\bfseries symmetric 
+    hyperbolic}.
+
+    \item The system of hyperbolic PDEs is {\bfseries strictly hyperbolic} if $A(x,t;\xi)$ has $m$ real, distinct 
+    eigenvalues
+        \begin{equation*}
+            \lambda_{1}(x, t; \xi) < \lambda_{2}(x, t; \xi) < \ldots < \lambda_{m}(x, t;\xi)
+        \end{equation*}
+    for all $x,\xi \in \mathbb{R}^{n}, t>0$ making $A(x, t; \xi)$ diagonalizable.
+\end{itemize}
+
+
+
+
+
+
+%==============================================CHAPTER 03===================================================
+%\chapter{Mathematical Techniques for Numerical Implementations}
+\chapter{Mathematical Approach to Discontinuities in Hyperbolic PDEs}
+The detailed discussion on the nature of solution associated in the previous section shows major challenges 
+that arise when dealing with Hyperbolic PDEs. The discussion on conservation laws was started off within a 
+continuous setting or solution domain, however, a sudden emergence of a discontinuity in the solution requires
+to further our understanding of these problems. This chapter brings to the forefront the mathematical techniques
+to tackle these issues one proceeds into their complutational implementation by answering the questions that 
+arise with a change in the solution scenario. 
+
+%--------------------------------SECTION 3.1-------------------------------------
+\section{Formation of Discontinuity and Rankine-Hugoniot Condition}
+Having discussed discontinuity in the mathematical solution in the previous chapter, we shall now see it from
+the point of view of conservation laws. Consider the scalar conservation law,
+\begin{equation} \label{scalarconsvlaw}
+    \frac{\partial u}{\partial t} + \frac{\partial f(u)}{\partial x} = 0, \quad (x, t)\in\Omega_{x}\times\Omega_{t}
+\end{equation}
+where, $u = u(x, t)$, $f = f(u(x,t))$ and the initial condition is $u(x, 0) = u_0(x)$. Assuming both $u$ and
+$f(u)$ are differentiable, we can write the above as,
+\begin{equation*}
+    \frac{\partial u}{\partial t} + f^{\prime}(u)\frac{\partial u}{\partial x} = 0, \quad (x, t)\in\Omega_{x}\times\Omega_{t}
+\end{equation*}
+where $f^{\prime}(u)$ can be identified as the wave speed. Thus characteristic can be expressed as,
+\begin{equation*}
+    \frac{dx}{dt} = f^{\prime}(u)
+\end{equation*}
+with the initial condition $x(0) = x_0 \in \Omega_x$. We know from the theory of method of characteristics that
+the solution $u$ is constant along the characteristic curves, i.e., $u(x, t) = u_0(x-f^{\prime}(u)t)$. This can 
+be re-written as $u(x, t) - u_0(x-f^{\prime}(u)t) = 0$. Differentiating this with respect to $x$ leads to and
+substituting into \eqref{scalarconsvlaw} gives,
+\begin{equation*}
+    \frac{\partial u}{\partial x} = \frac{u_{0}^{\prime}}{1 + u_{0}^{\prime}f^{\prime\prime}(u)t}, \qquad
+    \frac{\partial u}{\partial t} = \frac{u_{0}^{\prime}f^{\prime}(u)}{1 + u_{0}^{\prime}f^{\prime\prime}(u)t}
+\end{equation*}
+
+The above derivatives become unbounded with a finite time if $u_{0}^{\prime}f^{\prime\prime}(u)t<0$. Particularly,
+this is true in case when $f$ is convex, i.e., $f^{\prime\prime}(u)>0$, and the initial condition is decreasing, 
+i.e., $u_0^{\prime}<0$. The moment the solution reaches an unbounded derivative, the discontinuity or jump is formed.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.80\textwidth]{Discontinuity_01charac}
+    \caption{A solution for propagating discontinuity for Burgers' equation with $u_l > u_r$ (left) and corresponding characteristics (right)}
+    \label{fig:Discontinuity_01charac}
+\end{figure}
+
+Jump formation dramatically changes the situation and how we look at the solution earlier obtained with the method 
+of Characteristics. Discontinuity occurs when the characteristics meet at a particular point in the domain. Thus, 
+tracking the characteristic curves to obtain the soltuion is no more possible beyond the point at which they 
+intersect. Beyond the point of discontinuity, the characteristics may continue to emerge normally, however, their
+origin before the discontinuity can not be traced. Along with the emerging characteristics, the discontinuity also 
+continues to propagate along a particular characteristic.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.90\textwidth]{Discontinuity_01speed}
+    \caption{Sketch of a discontinuity propagating at constant speed $s$}
+    \label{fig:Discontinuity_01speed}
+\end{figure}
+
+To see what is the speed of propagating discontinuity, we consider the following situation: assume that the 
+discontinuity is located at $x=0, x\in[-L, L]$ and we denote $u_l$ and $u_r$ are the left and right state of the 
+solution, respectively, as shown in the figure \ref{fig:Discontinuity_01speed}. From our understanding of 
+conservation laws, we can write, 
+\begin{equation*}
+    \frac{d}{dt}\int_{-L}^{L}u(x, t)dx = f\left(u_{l}\right) - f\left(u_{r}\right)
+\end{equation*}
+Further, assuming that the discontinuity propagates at a constant speed $s$, conservation of mass would emphasize 
+the following,
+\begin{equation*}
+    \int_{-L}^{L}u(x, t)dx = (L + st)u_{l} + (L - st)u_{r}
+\end{equation*}
+from which we recover,
+\begin{equation*}
+    \frac { d } { d t } \int_{-L}^{L}u(x, t)dx = s\left(u_{l} - u_{r}\right) = f\left(u_{l}\right) - f\left(u_{r}\right)
+\end{equation*}
+
+An immediate consequence of this is,
+\begin{equation*}
+    s[u] = [f], \quad where [v] = v_{l} - v_{r}
+\end{equation*}
+known as the {\bfseries Rankine-Hugoniot Jump Condition}. From this we finally obtain the speed of discontinuity
+expressed as,
+\begin{equation} \label{Rankine-Hugoniot}
+    s = \frac{[f]}{[u]} = \frac{f\left(u_{l}\right) - f\left(u_{r}\right)}{u_{l} - u_{r}}
+\end{equation}
+
+This result is a consequence of mass conservation and is applicable across any discontinuity in general. Here, $u_l$
+and $u_r$ are right and left limiting velocities of the flowing medium, as $L\rightarrow 0$.
+
+\begin{example}
+    \normalfont Manipulating problem to incorporate discontinuity can be very taxing. To understand what these 
+    intricacies are let's us consider the Burgers' equation:
+    \begin{equation*}
+        \frac{\partial u}{\partial t} + \frac{\partial u^{2}}{\partial x} = 0
+    \end{equation*}
+\end{example}
+Applying Rankine-Hugoniot condition, we obtain the speed of propagation of wave as,
+\begin{equation*}
+    s = \frac{u_{l}^{2} - u_{r}^{2}}{u_{l} - u_{r}} = u_{l} + u_{r}
+\end{equation*}
+
+Let us manipulate the main equation a little. Assuming that the solution is continuous, let us multiply the entire
+equation with $u^2$, we get:
+\begin{equation*}
+    \frac {\partial u^{2}}{\partial t} + \frac{4}{3}\frac{\partial u^{3}}{\partial x} = 0
+\end{equation*}
+Again, applying Rankine-Hugoniot condition, we get the speed of propagating discontinuity as:
+\begin{equation*}
+    s = \frac{4}{3}\frac{u_{l}^{3} - u_{r}^{3}}{u_{l}^{2} - u_{r}^{2}}
+\end{equation*}
+We see that for discontinuous problem the application of Rankine-Hugoniot conditions yields different values of 
+speed of propagating discontinuity. Thus, we learn that manipulations that work well with smooth solutions fail 
+with the ones with discontinuities.
+
+\begin{center}
+    \line(1,0){100}
+\end{center}
+
+One of the immediate consequences of discontinuity within a solution is the inability of the application of derivatives
+in a classical sense. Under such circumstances, we modify the above Burgers' equation as follows:
+\begin{equation*}
+    \frac{\partial u_{\varepsilon}}{\partial t} + \frac{\partial u_{\varepsilon}^{2}}{\partial x} = \varepsilon\frac{\partial^{2}u_{\varepsilon}}{\partial x^{2}}
+\end{equation*}
+where $u_{\varepsilon}$ is smooth. In a limiting case, it is usual to say that $\left\|u - u_{\varepsilon}\right\|$
+approaches zero as $\varepsilon\rightarrow 0$. From a qualitative standpoint, to understand why this works, let us 
+consider the following:
+\begin{equation*}
+    \frac{\partial u_{\varepsilon}}{\partial t} + a\frac{\partial u_{\varepsilon}}{\partial x} = \varepsilon\frac{\partial^{2}u_{\varepsilon}}{\partial x^{2}}
+\end{equation*}
+and let us try to find a travelling wave kind of a solution for the above, namely, of the form $u_{\varepsilon}(x, t) = v_{\varepsilon}(x - at, t)$.
+Inserting this to the equation above, we get:
+\begin{equation*}
+    \frac{\partial v_{\varepsilon}}{\partial t} = \varepsilon\frac{\partial^{2} v_{\varepsilon}}{\partial x^{2}}
+\end{equation*}
+which we recognize as the heat equation for which we have an analytic solution for $t>0$. There is yet another way 
+of looking at this heat equation: in part of the domain where there is no discontinuity, we can say that any 
+perturbation in $v_{\varepsilon}$ is dissipated over time due to the term on the right. In a limiting condition (applied
+in parts where there is discontinuity), the $\varepsilon\rightarrow 0$ causes the solution to smoothen. This approach
+is called {\bfseries Vanishing viscosity solutions}, and it overcomes the challenges arising due to loss of classical
+solutions due to discontinuity. However, there arises a need to understand the nature of convergence of 
+$\left\|u - u_{\varepsilon}\right\|$.
+
+%--------------------------------SECTION 3.2-------------------------------------
+\section{Weak Solutions}
+With the rise in discontinuity of the solution, classical derivates cannot be applied as flexibly as in the case of
+a continuous domain. Thus, we need to look into mathematical methods that eliminate this dependence on derivatives.
+Therefore, we now introduce the concept of weak solutions \textemdash a method aimed at reducing the dependence of 
+differential equations on higher order derivates to lower orders. 
+
+To understand the idea of weak solutions, let us invoke the equation \eqref{gen_consform} from Chapter 1:
+\begin{equation} \label{conseq}
+    \int_{\Omega_{x}}u\left(x, t_{2}\right)dx - \int_{\Omega_{x}} u\left(x, t_{1}\right)dx = \int_{\Omega_{t}} (f\left(x_{1}, t\right) - f\left(x_{2}, t\right))dt
+\end{equation}
+We now introduce a test function which is $c^1$, $\phi(x,t): \Omega_x\times\Omega_t\rightarrow\mathbb{R}$ that is 
+has values prescribed at the boundary, i.e., $\phi$ vanishes as $x\rightarrow{\partial \Omega_x}$ and $t\rightarrow T$.
+Now consider,
+\begin{equation*}
+    \int_{\Omega_{x}}\int_{\Omega_{t}}\left[\frac{\partial u}{\partial t} + \frac{\partial f(u)}{\partial x}\right]\phi(x, t)dxdt = 0
+\end{equation*}
+
+Integration by parts results into the following,
+\begin{equation} \label{weaksolneq1}
+    \int_{\Omega_{x}}\int_{\Omega_{t}}\left[u\frac{\partial \phi}{\partial t} + f(u)\frac{\partial \phi}{\partial x}\right]dxdt = -\int_{\Omega_{x}}u(x, 0)\phi(x, 0)dx
+\end{equation}
+
+Further, to be able to mathematically model the discontinuity, we introduce the following function,
+\begin{equation}
+    g(x; a, b, \varepsilon) = \begin{cases}
+    \; 1, & \quad a\leq x\leq b\\[-0.5em]
+    \; q_a(x), & \quad a - \varepsilon\leq x \leq a\\[-0.5em]
+    \; q_b(x), & \quad b\leq x\leq b + \varepsilon \\[-0.5em]
+    \; 0, & \quad \text{otherwise}
+    \end{cases}
+\end{equation}
+where, both $q_a(x)$ and $q_b(x)$ are polynomial of sufficiently higher order spread over the length $\varepsilon$ 
+and take value from the domain $[0, 1]$ and both connect zero and one smoothly. Similar to the case before, we 
+define a test function as
+\begin{equation*}
+    \phi(x, t) = g\left(x; x_{1}, x_{2}, \varepsilon\right) \times g\left(t; t_{1}, t_{2},\varepsilon\right)
+\end{equation*}
+we see that $\partial_x\phi = \partial_t\phi = 0$ for $(x, t)=[x_1, x_2]\times[t_1, t_2] = \Omega_x\times\Omega_t$.
+As $\varepsilon\rightarrow 0$, $\partial_x\phi(x_1)$ approaches $\delta_{x_1}(x)$, where $\delta_{x_0}(x)$ is the 
+Dirac delta function defined as,
+\begin{equation}
+    \delta_{x_0}(x) = \begin{cases}
+    \; 1, & \quad x = x_0\\[-0.5em]
+    \; 0, & \quad x \neq x_0
+    \end{cases}
+\end{equation}
+
+Integrating by parts with above constraints yields a result similar to \eqref{conseq} given by,
+\begin{equation} \label{weaksolneq2}
+    \int_{\Omega_{x}}u\left(x, t_{2}\right)dx - \int_{\Omega_{x}} u\left(x, t_{1}\right)dx + \int_{\Omega_{t}} (f\left(x_{2}, t\right) - f\left(x_{1}, t\right))dt = -\int_{\Omega_{x}}u(x, 0)\phi(x, 0)dx
+\end{equation}
+The only difference is due to the term on the right hand side of the above equation. This term accounts for the 
+initial value. The equations \eqref{weaksolneq1} and \eqref{weaksolneq2} are weak solutions to the corresponding 
+strong form given by the equation \eqref{conseq} and holds for all admissible test functions. With the introduction
+of weak solutions we indeed overcome the problem of loss of derivatices in classical sense once a discontinuity 
+forms. However, it arises another problem which we shall see in the examples that follows.
+
+\begin{example}
+    \normalfont Consider Burgers' equation,
+    \begin{equation*}
+        \frac{\partial u}{\partial t} + \frac{\partial u^{2}}{\partial x} = 0, \quad x\in[0,1]
+    \end{equation*}
+    with the initial conditions,
+    \begin{equation*}
+        u_0(x) = \begin{cases}
+        \; 1, & \quad x < 0.2\\[-0.5em]
+        \; 2, & \quad x \geq x_0
+        \end{cases}
+    \end{equation*}
+\end{example}
+By application of Rankine-Hugoniot condition and method of characteristics, we obtain the solution as 
+$u(x,t) = u_0(x-3t)$.
+Literatures referenced below also state that the example above has the following classical solution for $t>0$
+\begin{equation*}
+    u(x, t) = \begin{cases}
+    \; 1, & \quad x < 0.2+2t\\[-0.5em]
+    \; (x - 0.2)/2t, & \quad 0.2+2t < x < 0.2+4t\\[-0.5em]
+    \; 2, & \quad x > 0.2+4t
+    \end{cases}
+\end{equation*}
+Introduction of the concept of weak solution has an unfortunate impact on the uniqueness of the solution. This
+is because any solution of the type
+\begin{equation*}
+    u(x, t) = \begin{cases}
+    \; 1, & \quad x < 0.2+2st\\[-0.5em]
+    \; u_m, & \quad 0.2+2st < x < 0.2+2u_{m}t\\[-0.5em]
+    \; (x - 0.2)/2t, & \quad 0.2+2u_{m}t < x < 0.2+4t\\[-0.5em]
+    \; 2, & \quad x > 0.2+4t
+    \end{cases}
+\end{equation*}
+is a weak solution to Burgers' equation with the given initial conditions. Here, $s\in(1,u_m)$ is the speed of 
+propagating discontinuity and $u_m \in (1, 2)$. There then arises a question: which of these solutions or solution
+set should one pick as the correct result? Also, what is the criteria that one should follow to pick the correct 
+result?
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.80\textwidth]{Discontinuity_02charac}
+    \caption{A solution for propagating discontinuity for Burgers' equation with $u_r > u_l$ (left) and corresponding characteristics (right)}
+    \label{fig:Discontinuity_02charac}
+\end{figure}
+
+Let us begin the comparison between the figure \ref{fig:Discontinuity_01charac} and \ref{fig:Discontinuity_02charac} 
+which show the wave propagation based on $u_l > u_r$ and $u_l < u_r$ respectively. In case of figure 
+\ref{fig:Discontinuity_01charac}, the characteristics run into the propagating discontinuity, while in the latter, 
+the characteristics emerge out of the discontinuity and it leads to a major inference \textemdash in the latter case,
+we have no direct relationship between the emerging characteristics and the initial condition. This is an unstable
+condition given that any minor perturbation in the initial condition will change the discontinuity and thereby the
+solution. Thus, one conclusion is to eliminate the solution based on $u_l < u_r$ and only the classical solution
+known as {\bfseries rarefaction wave} (shown in the figure \ref{fig:Discontinuity_03rarefaction}) be retained as the
+admissible solution. Having done this qualitatively, let's formulate the mathematical criteria that leads to such
+a deduction. 
+
+\section{Lax-Entropy Condition and Uniqueness of Solutions}
+Weak Solutions raise questions on uniqueness which we briefly discussed in the previous section. Therefore, we need 
+a criteria to decide the admissibility of a solution as physically revalant. Often such a solution is called 
+Entropy Solution. In this section, we shall discuss about such a criteria and its sufficiency in determining
+admissible solutions in our context.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.80\textwidth]{Discontinuity_03rarefaction}
+    \caption{A classical solution for propagating discontinuity for Burgers' equation with $u_r > u_l$ (left) and corresponding characteristics (right), also called as rarefaction wave}
+    \label{fig:Discontinuity_03rarefaction}
+\end{figure}
+
+From discussion before, we see there is a distinction between the two solution sets \textemdash one where the 
+characteristics run into the discontinuity, while the other where the characteristics emerge from the discontinuity.
+The former one is the one that is physically relevant as those are the solution set in which the final solution can 
+be traced back to the initial condition while in the latter a clear connection with the initial connection cannot 
+be established. Based on this discussion, we introduce the condition of admissibility of solutions \textemdash an 
+entropy condition \textemdash which is given by
+\begin{equation}
+    \forall u \in \left(u_{l}, u_{r}\right):\frac{f(u) - f\left(u_{l}\right)}{u - u_{l}} \geq s \geq \frac{f(u) - f\left(u_{r}\right)}{u - u_{r}}
+\end{equation}
+which inherently displays the idea of the characteristics running into the discontinuity. This condition is often
+called {\bfseries Entropy-Lax Condition}. This idea of entropy is borrowed from thermodynamics which helps in
+deciding the direction of time by imposing the condition of increasing entropy. However, in the context of 
+conservation laws, the entropy decreases and this is done by choosing the direction of time such that it incorporates
+the definition of entropy borrowed from thermodynamics. At this point of time it is suitable to bring into notice,
+that the solution in figure \ref{fig:Discontinuity_02charac} becomes physically relevant if we reverse the direction of
+time. We will now develop on this idea of decreasing entropy and see that it turns out to be a rather significant 
+criteria in determining the physically relevant results.
+
+Assuming that $f(u)$ is a convex function, we find that,
+\begin{equation*}
+    \begin{split}
+        s \leq \frac{f(u) - f\left(u_{l}\right)}{u - u_{l}} & = \frac{f\left(u_{l}\right) + f^{\prime}\left(u_{l}\right)\left(u - u_{l}\right) + \frac {1}{2}f^{\prime\prime}(\xi)\left(u - u_{l}\right)^{2} - f\left(u_{l}\right)}{u - u_{l}}\\
+         & = f^{\prime}\left(u_{l}\right) + \frac{1}{2}f^{\prime\prime}(\xi)\left(u - u_{l}\right)
+    \end{split}
+\end{equation*} 
+With the assumption above, we can say that $s < f^{\prime}(u_l)$ provided $u_l > u_r$. Computing the same for $u_r$,
+we find,
+\begin{equation*}
+    \begin{split}
+        s \geq \frac{f(u_{r}) - f\left(u\right)}{u_{r} - u} & = \frac{f\left(u_{l}\right) - \left(f\left(u_{r}\right) - f^{\prime}\left(u_{r}\right)\left(u_{r} - u\right) + \frac{1}{2}f^{\prime\prime}(\xi)\left(u_{r} - u\right)^{2}\right)}{u_{r} - u}\\
+         & = f^{\prime}\left(u_{r}\right) - \frac{1}{2}f^{\prime\prime}(\xi)\left(u_{r} - u\right)
+    \end{split}
+\end{equation*} 
+which implies that $s > f^{\prime}(u_r)$. The two is then combined to form what is called the {\bfseries Simplified
+Lax-Entropy condition} given by,
+\begin{equation} \label{Lax-Entropy}
+    f^{\prime}\left(u_{l}\right) > s > f^{\prime}\left(u_{r}\right), \qquad f^{\prime\prime}(u) > 0
+\end{equation}
+
+Therefore, a shock will be redefined as a discontinuity that satisfies Ranking-Hugoniot condition 
+\eqref{Rankine-Hugoniot} and the Lax-Entropy condition \eqref{Lax-Entropy}. This marks the completion of the study 
+on mathematical formulation required to sufficiently define a discontinuity and check its relevance from standpoint 
+of physically valid conservation laws. 
+
+
+
+%==============================================CHAPTER 04===================================================
+\chapter*{Conclusion}
+The problem of wave simulation through Hyperbolic PDEs is a key area of reseach especially due to its very wide
+scope of applications in physics, fluid and solid mechanics, electromagnetism and so on. This report on \emph{Wave 
+Simulation through Hyperbolic PDEs} gives an insight into the fundamental of mathematics that is necessary while 
+modelling these problems for computational purposes. Starting with a discussion on simple fluid flow problems, it
+reveals ways in which conservation laws translate into mathematics. Most of these equations involve finding solutions 
+to PDEs either analytically or numerically, the report presents the techniques, intricacies and challenges in solving
+PDEs. Hyperbolic PDEs, the key theme of the report, is then weaved in and the nature of its solution with a primary 
+focus on the discontinuities is elaborately discussed. Since PDEs, in the very vague sense, involve differentials 
+from the calculus viewpoint, we realize that discontinuities breakdown the use of these mathematical tools of 
+calculus in a classical sense. Finally to tackle with this limitation, the report throws light over the redimentary 
+mathematical approaches such as weak solutions, Rankine-Hugoniot condition and Lax-Entropy condition to tackle the
+discontinuites in the solution space arising due to the nature of Hyperbolic PDEs. 
+
+
+
+%==============================================REFERENCES===================================================
+\newpage
+\begin{thebibliography}{3}
+\bibitem{BookHesthaven}
+Hesthaven J S. \textit{Numerical Methods for Conservation Laws: From Analysis to Algorithm}. Society for Industrial and Applied Mathematics (SIAM) 2018.
+    
+\bibitem{TutorialBressen}
+Bressan A. \textit{Hyperbolic Conservation Laws: An illustrated Tutorial}. Department of Mathematics, Penn State University (USA) 2009.
+
+\bibitem{LecNptesLevandosky}
+Levandosky J. \textit{Lecture Notes MA220A: Partial Differential Equations of Applied Mathematics}. Department of Mathematics, Standford University (USA) 2002.\\
+{\bfseries weblink:} https://web.stanford.edu/class/math220a/  
+\end{thebibliography}
+
+\end{document}
