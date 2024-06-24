@@ -1,14 +1,18 @@
-\documentclass[11pt, a4paper]{report}
+\documentclass[12pt, a4paper]{report}
     \usepackage[utf8]{inputenc}
     \usepackage[T1]{fontenc}
     \usepackage[urw-garamond]{mathdesign} %for using math with garamond font
     %\usepackage{lmodern}
     \usepackage{titlesec}
-    \usepackage{amsmath} %for cross-referencing math equations
+    \usepackage{amsmath, xparse} %for cross-referencing math equations
     \usepackage[mathscr]{eucal}
     %\usepackage{amsfonts}
     \usepackage{amsthm}
+    %\usepackage{amssymb}
+    %\let\oldemptyset\emptyset
+    %\let\emptyset\varnothing
     \usepackage{bm} %for using bold font letters in inline mathematical expressions
+    \usepackage{xcolor}
     \usepackage{graphicx}
     \usepackage{graphics}
     \usepackage{subcaption}
@@ -16,11 +20,52 @@
     \usepackage{epstopdf}
     \usepackage{titlesec} %for numbering of subsubsection
     \usepackage{parskip}
-    \usepackage[symbol]{footmisc} % for using footnote with symbols instead of numbers
     \usepackage{enumitem} %for enumerations of lists with numbers or alphabets and so on.......
     \usepackage[margin=2cm, includefoot]{geometry}
     \usepackage[labelfont={small, bf}, textfont={small, it}]{caption} %used for making the captions in images small and italicized
+    \usepackage{tikz}
+    \usetikzlibrary{arrows}
+
+    \makeatletter
+    \newcommand\@erelb@r[1]{%
+    \mathrel{\tikz[baseline=-.5ex]\draw[#1] (0,0)--(0.3,0);}
+    }
+    % 0 is for nothing
+    % 1 is for arrowhead
+    % 2 is for bar
+    % 3 is for both
+    \newcommand{\erelbar}[1]{\@erelbar#1}
+    \def\@erelbar#1#2{%
+    \ifcase\numexpr#1*4+#2\relax
+        \@erelb@r{-}\or     % 00
+        \@erelb@r{->}\or    % 01
+        \@erelb@r{-|}\or    % 02
+        \@erelb@r{->|}\or   % 03
+        \@erelb@r{<-}\or    % 10
+        \@erelb@r{<->}\or   % 11
+        \@erelb@r{<-|}\or   % 12
+        \@erelb@r{<->}\or   % 13
+        \@erelb@r{|-}\or    % 20
+        \@erelb@r{|->}\or   % 21
+        \@erelb@r{|-|}\or   % 22
+        \@erelb@r{|<->|}\or % 23
+        \@erelb@r{|<-}\or   % 30
+        \@erelb@r{|<->}\or  % 31
+        \@erelb@r{|<-|}\or  % 32
+        \@erelb@r{|<->|}    % 33
+    \else
+        \@wrong
+    \fi
+    }
+    \makeatother
     
+    % Custom definition for footnote symbols
+    \makeatletter
+    \def\@fnsymbol#1{\ensuremath{\ifcase#1\or *\or \dagger\or \ddagger\or
+    \mathsection\or \mathparagraph\or \|\or **\or \dagger\dagger
+    \or \ddagger\ddagger \else \@ctrerr\fi}}
+    \makeatother
+
     % Packages for title page and section formatting
     \usepackage{titling}
     \usepackage{sectsty}
@@ -43,7 +88,6 @@
     \renewcommand*\descriptionlabel[1]{\hspace\leftmargin$#1$}
     \renewcommand{\thefootnote}{\fnsymbol{footnote}} %for using footnotes with symbols rather than numbers
     \renewcommand{\bibname}{References} %to rename bibliography section to "References"
-
     
     % Set section font size and type, and adjust spacing
     \titleformat{\section}
@@ -82,6 +126,8 @@
     \newtheorem{theorem}{Theorem}[section]
     \newtheorem{corollary}{Corollary}[theorem]
     \newtheorem{definition}{Definition}
+
+    %\numberwithin{equation}{section}
     
     \renewcommand{\thesection}{\arabic{section}} %to remove 0.x in numbered sections
     %\renewcommand{\theorem}{\arabic{section}.\arabic{theorem}}
@@ -105,7 +151,7 @@
     
     \LARGE{\bfseries {Prabha Shankar}}\\
     \small{Masters Student, Mathematical Physics}\\
-    \small{(Department of Mathematics, Leipzig University)}\\
+    \small{(Department of Physics, Leipzig University)}\\
     
     \vspace{3cm}
     \normalsize{\emph {Under the supervision of}}\\
@@ -142,16 +188,18 @@ This is the third chapter
 \section{Causality for Spacetimes with Trapped Surfaces}
 Obviously! This is the fourth chapter
 
+
+%================== PENROSE INCOMPLETENESS THEOREM ==========================
 \section{Penrose Incompleteness Theorem}
 \subsection{Motivation}
-\begin{theorem}[Penrose Incompleteness Theorem]
+\begin{theorem}[Penrose Incompleteness Theorem]\label{incompletethm}
 Let $\left(\mathcal{M}, g\right)$ be a globally hyperbolic
 time-orientable (Hausdorff) spacetime with a non-compact Cauchy Hypersurface
 $\mathcal{H}$ such that $\mathcal{M}$ contains a trapped surface $S$. If, in
 addition, $\left(\mathcal{M}, g\right)$ satisfies $\text{\textit{Ric}}\left(L,
 L\right) \geq 0 \;\forall$ null vector fields $L$, then $\mathcal{M}$ is future
 geodesically incomplete. In fact, $\exists$ a null generator of $C \cup
-\underbar{$C$}$, the future null geodesic congruences normal to $S$, that cannot
+\textit{\underbar{C}}$, the future null geodesic congruences normal to $S$, that cannot
 be extended $\forall \tau \geq 0$ in $\mathcal{M}$.
 \end{theorem}
 
@@ -163,11 +211,11 @@ be extended $\forall \tau \geq 0$ in $\mathcal{M}$.
     A geodesic complete manifold implies that all its causal geodesics can be
     extended to arbitrary values of their affine parameters. Formally, a
     manifold $\left(\mathcal{M}, g\right)$ is geodesically complete if every
-    timelike (or null) geodesic $\gamma : \mathbb{R}\supset \left(-\epsilon,
-    \epsilon\right) \to \mathcal{M}$, such that $\gamma\left(0\right) = p,
+    timelike (or null) geodesic $\gamma : \mathbb{R}\supset \left(-\varepsilon,
+    \varepsilon\right) \to \mathcal{M}$, such that $\gamma\left(0\right) = p,
     \;\forall p$ can be extended to $\widetilde{\gamma} : \mathbb{R} \to
     \mathcal{M}$. That is, the timelike or null geodesics can be extended from a
-    real interval to the entire real line.
+    real interval to the entire real line. 
 \end{definition}
 
 \begin{proof}[Proof to Corollary \ref{MinkGeodcomplete}] 
@@ -181,13 +229,115 @@ be extended $\forall \tau \geq 0$ in $\mathcal{M}$.
     \begin{equation*}
         \frac{d^2 x^\sigma}{d\tau^2} + \Gamma^{\sigma}_{\alpha\beta}\frac{dx^\alpha}{d\tau}\dfrac{dx^\beta}{d\tau} = 0
     \end{equation*}
-    , which reduces to {\large{$\frac{d^2 x^\sigma}{d\tau^2} = 0$}}. The general solution of
-    such a differential equation is given by $x^{\mu}\left(\tau\right) = A^\mu
-    \tau + B^\mu$, where the constants $A^\mu$ and $B^\mu$ can be determined
-    based on the initial data. We see that $x^\mu\left(\tau\right)$ is linear in
-    the affine parameter and can be extended to any arbitrary value of $\tau$.
-    Since this is true for any arbitrary curve in Minkowski spacetime, this
-    completes our proof.
+    , which reduces to {\large{$\frac{d^2 x^\sigma}{d\tau^2} = 0$}}. The general
+    solution of such a differential equation is given by
+    $x^{\mu}\left(\tau\right) = A^\mu \tau + B^\mu$, where the constants $A^\mu$
+    and $B^\mu$ can be determined based on the initial data. We see that
+    $x^\mu\left(\tau\right)$ is linear in the affine parameter and can be
+    extended to any arbitrary value of $\tau$. Since this is true for any
+    arbitrary curve in Minkowski spacetime, this completes our proof.
+\end{proof}
+
+The proof of the Penrose Incompleteness theorem relies on two important
+theorems/results from differential topology. These are presented below and proof
+to only the second one is provided:
+\begin{enumerate}[leftmargin=*, label={\bfseries{Ingredient theorem (\roman*)}}]
+	\item \label{topologicaltheorem1} A bijective continuous map from compact
+	spaces to a Hausdorff space is a homeomorphism.
+	\item \label{topologicaltheorem2} Let $\mathcal{N} \subset \mathcal{M}$ be
+	an (injective) immersed topological submanifold with
+	dim$\left(\mathcal{N}\right) = $ dim$\left(\mathcal{M}\right) = n$ such that
+	$\mathcal{N}$ is compact and $\mathcal{M}$ is a Hausdorff connected
+	non-compact topological manifold. Then $\partial_{\text{mani}}\mathcal{N} \neq
+	\varnothing$, where $\partial_{\text{mani}}\mathcal{N}$ denotes the boundary
+	of $\mathcal{N}$ in the sense of (topological) manifolds.
+\end{enumerate}
+
+\begin{proof}[Proof to \ref{topologicaltheorem2} (By contradiction)]
+    Assume $\partial_{\text{mani}}\mathcal{N} = \varnothing$ \newline $\implies
+    \forall x \in \mathcal{N}, \;\exists \delta > 0$, such that
+    $\text{B}_\delta\left(x\right)$ homeomorphic to $\mathbb{R}^n$.\newline
+    Since, dim$\left(\mathcal{M}\right) = \text{dim}\left(\mathcal{N}\right)$,
+    $\text{B}_\delta\left(x\right)$ is also open in $\mathcal{M}$. By
+    compactness, we can say that $\mathcal{N} \subset \mathcal{M}$ is open. However,
+    $\mathcal{N}$ is compact and is a subset of a Hausdorff space, hence,
+    $\mathcal{N}$ is closed. By connectedness, $\mathcal{M} = \mathcal{N}$,
+    which is a contradiction.
+\end{proof}
+
+We move on to the proof of the Penrose Incompleteness theorem.
+\begin{proof}[Proof to the Penrose Incompleteness Theorem \ref{incompletethm}]
+From the results of \textcolor{red}{Section - look into the previous section},
+we know that if $\mathrm{tr}\raisebox{0.5ex}{$\chi$}_x = -k_x < 0, \;x \in S =
+\{\tau = 0\}$, then the first focal point of the generator $G_x \subset C$
+appears at time {\large{$\tau = \frac{2}{k_x}$}}. In view of compactness of
+$S$\footnote[2]{A continuous function on a compact set is bounded and attains its
+maximum}, we have:
+\begin{equation}
+    \sup_{S} \mathrm{tr}\raisebox{0.5ex}{$\chi$} = k_{C} < 0\;, \qquad
+    \sup_{S} \mathrm{tr}\raisebox{0.5ex}{$\chi$} = k_\textit{\underbar{C}} < 0\;, 
+    \qquad \sup \{k_C, k_\textit{\underbar{C}}\} = k < 0
+\end{equation}
+We assume $\left(\mathcal{M}, g\right)$ to be future null geodesically complete.
+We define $\mathscr{V}$ to be the union of all the null generators of $C \cup
+\textit{\underbar{C}}$ for which $0 \leq \tau \leq 2/k$, i.e.,
+\begin{equation}\
+    \mathscr{V} = \bigcup_{\substack{\tau \;\in \;\left[0, \;\frac{2}{k}\right]\;, \\[0.2em] x \;\in \;S}}
+    \left(G_x\left(\tau\right), \;\; \textit{\underbar{G}}_x\left(\tau\right)\right)
+\end{equation}
+\textcolor{red}{(Check this bit)} Based on this construction, $\mathscr{V}
+\subset \mathcal{M}$. The null generators, $G$ and \textit{\underbar{G}}, can be
+viewed as the following continuous maps:
+\begin{equation*}
+    \begin{split}
+    G: S \times \left[0, \frac{2}{k}\right] \to C\;, \qquad \left(x, \tau\right) \erelbar{21} G_x\left(\tau\right) \\
+    \qquad \textit{\underbar{G}}: S \times \left[0, \frac{2}{k}\right] \to \textit{\underbar{C}}\;, \qquad \left(x, \tau\right) \erelbar{21} \textit{\underbar{G}}_x\left(\tau\right) 
+    \end{split}
+\end{equation*}
+Continuity implies that the null generators are mappings between compact sets.
+This implies that $\mathscr{V}$ is itself compact.\\
+The trace condition implies every null generator in $\mathscr{V}$ contains at
+least one focal point. Therefore, \textcolor{red}{from the previous section on
+causality}, we can say that:
+\begin{equation}{\label{eq:CausalBoundaryVM}}
+    \partial\hspace{-0.3em}\mathcal{J}^+\left(S\right) \subseteq \mathscr{V} \subset \mathcal{M}.
+\end{equation}
+The topological boundary $\partial\hspace{-0.3em}\mathcal{J}^+\left(S\right)$ is
+closed by definition\footnote[3]{Topological boundary of subset $A$ of a
+topological space $X$, $\partial\hspace{-0.2em} A$, is given by
+$\partial\hspace{-0.2em} A = \overline{A} \cap \overline{X \backslash A}$.}.
+Since $\mathscr{V}$ is compact, by \ref{eq:CausalBoundaryVM}, we conclude
+$\partial\hspace{-0.3em}\mathcal{J}^+\left(S\right)$ is
+compact\footnote[7]{Closed subset of a compact set is itself compact.}.\\
+We now show that global topological argument leads to a contradiction, and hence
+$\left(\mathcal{M}, g\right)$ cannot be future null geodesically complete.
+
+Since $\mathcal{M}$ is time-orientable, $\exists$ global timelike vector field
+$T$ whose integral curves are timelike foliate of $\mathcal{M}$  and intersect
+the Cauchy Hypersurface exactly once. Futhermore, the integral curves intersect
+$\partial\hspace{-0.3em}\mathcal{J}^+\left(S\right)$ exactly once, since
+$\mathcal{J}^+\left(S\right)$ is future set and the topological boundary of a
+future set is a closed achronal three-dimensional Lipschitz submanifold without
+boundary\footnote[9]{\textbf{Proposition:} Let $\mathcal{F}$ be a future set in
+a Lorentzian manifold $\mathcal{M}$. Then the topological boundary
+$\partial\hspace{-0.2em}\mathcal{F}$ is closed achronal three-dimensional
+locally Lipschitz submanifold of $\mathcal{M}$ such that
+$\partial_{\text{mani}}\partial\hspace{-0.2em}\mathcal{F} \neq \varnothing$}
+where $\partial_{\text{mani}}$ denotes the boundary in the sense of
+(topological) manifolds. Projection of
+$\partial\hspace{-0.3em}\mathcal{J}^+\left(S\right)$ on $\mathcal{H}$ via the
+integral curve $T$ is a continuous injective mapping from
+$\partial\hspace{-0.3em}\mathcal{J}^+\left(S\right)$ onto a subset of
+$\mathscr{T}\subset\mathcal{H}$. \\
+From \ref{topologicaltheorem1}, we can say that
+$\partial\hspace{-0.3em}\mathcal{J}^+\left(S\right)$ is homeomorphic to
+$\mathscr{T}\subset\mathcal{H}$. This implies that $\mathscr{T}$ is a Lipschitz
+three-dimensional compact submanifold without a boundary, i.e.,
+$\partial_\text{mani}\mathscr{T}\neq\varnothing$, in the compact
+three-dimensional manifold $\mathcal{H}$. However, from
+\ref{topologicaltheorem2}, $\mathscr{T}$ must have a non-empty boundary. This is
+a contradiction. Thus, our assumption that $\left(\mathcal{M}, g\right)$ is
+future null geodesically complete is false. 
 \end{proof}
 
 \end{document}
