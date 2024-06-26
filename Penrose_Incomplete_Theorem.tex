@@ -2,7 +2,7 @@
     \usepackage[utf8]{inputenc}
     \usepackage[T1]{fontenc}
     \usepackage[urw-garamond]{mathdesign} %for using math with garamond font
-    %\usepackage{lmodern}
+    \usepackage{mathtools}
     \usepackage{titlesec}
     \usepackage{amsmath, xparse} %for cross-referencing math equations
     \usepackage[mathscr]{eucal}
@@ -23,6 +23,11 @@
     \usepackage{enumitem} %for enumerations of lists with numbers or alphabets and so on.......
     \usepackage[margin=2cm, includefoot]{geometry}
     \usepackage[labelfont={small, bf}, textfont={small, it}]{caption} %used for making the captions in images small and italicized
+    \usepackage{cancel}
+    
+    \usepackage{cleveref}
+    \crefname{equation}{Equation}{Equations}
+    
     \usepackage{tikz}
     \usetikzlibrary{arrows}
 
@@ -125,7 +130,11 @@
     \newtheorem{example}{Example}[section] %for enumerating examples within a chapter
     \newtheorem{theorem}{Theorem}[section]
     \newtheorem{corollary}{Corollary}[theorem]
-    \newtheorem{definition}{Definition}
+    \newtheorem{proposition}{Proposition}[section]
+    \newtheorem{definition}{Definition}[section]
+
+    \newcommand{\underit}[1]{\textit{\underbar{#1}}}
+    \newcommand{\chits}{\raisebox{0.5ex}{$\chi$}} %typeset chi
 
     %\numberwithin{equation}{section}
     
@@ -163,30 +172,165 @@
 
 %=================TABLE OF CONTENTS AND LIST OF FIGURES=======================
 \section*{Introduction}
-Entities composing the nature constantly alter due to the processes of nature
-and their interactions with the other entities. The concept of conservation, an
-omnipresent phenomena, is therefore the key to understand these processes as it
-helps in the determination of parameters such as quantity of interacting
-material, its velocity, temperature, energy and so forth. This report deals with
-the nature of connservation laws and by means of mathematical modelling helps in
-qualitative understanding of these equations as propagating waves of
-disturbances through a medium. Specifically, this report is an endeavor to
-understand the challenges that arise when numerically solving Hyperbolic PDEs by
-throwing light on the discontunuities that arise in its solution space and
-brings forth key ideas and techniques to better combat the challenges in their
-computational implementations. 
+This is the placeholder for introduction.
 
 \section{Double Null Hypersurfaces and Foliations}
 This is the first chapter
 
 \section{Null Structure Equations}
-This is the second chapter
+This is the second chapter 
 
-\section{Null Hypersurface Regularity}
+\section{Condition for Regularity of Null Hypersurfaces}
 This is the third chapter
 
 \section{Causality for Spacetimes with Trapped Surfaces}
-Obviously! This is the fourth chapter
+Recall the geometric construction in the previous sections. If $S$ is a closed
+2-dimensional surface in a globally hyperbolic time-orientable spacetime
+$\left(\mathcal{M}, g\right)$ and $C$ and \textit{\underbar{C}} be future
+outgoing and incoming null geodesic congruence normal to $S$ respectively. Then:
+\begin{equation}
+    \partial\hspace{-0.3em}\mathcal{J}^+\left(S\right) \subset C \cup \textit{\underbar{C}}.
+\end{equation}
+We always have:
+\begin{equation}
+    C \cup \textit{\underbar{C}} \subset \mathcal{J}^+\left(S\right).
+\end{equation}
+However, it is not always the case that:
+\begin{equation}\label{eq:BCnotalwaystrue}
+    C \cup \textit{\underbar{C}} \subset \partial\hspace{-0.3em}\mathcal{J}^+\left(S\right).
+\end{equation}
+The reason for this is in case $C \cup \textit{\underbar{C}}$ lies in the
+interior of the future of $S$, i.e., $\mathcal{J}^+\left(S\right)$ implies
+$\exists$ timelike curves connecting points on $C \cup \textit{\underbar{C}}$ to
+$S$ and also to a neighborhood of $S$ which is interior of
+$\mathcal{J}^+\left(S\right)$.
+
+\textcolor{red}{Insert connecting text here}
+
+\begin{proposition}
+    Let $S$ be a closed 2-dimensional manifold surface in a globally hyperbolic
+    time oriented spacetime $\left(\mathcal{M}, g\right)$. Let $C$ and
+    \textit{\underbar{C}} denote the (future) outgoing and incoming null
+    geodesic congruence normal to $S$. Let $C^*$ and $\textit{\underbar{C}}^*$
+    be parts of $C$ and \textit{\underbar{C}} that do not contain any focal
+    point. Then, $\partial\hspace{-0.3em}\mathcal{J}^+\left(S\right) \subset C^*
+    \cup \textit{\underbar{C}}^*$.
+\end{proposition}
+
+\subsection{Trapped Surface}
+Assume $\Omega = 1$ on $C \cup \textit{\underbar{C}}$. Consider $L$ and
+$\underit{L}$ to be the geodesic vector field of $C$ and $\underit{C}$ with
+$\tau$ and \underit{$\tau$} the respective affine parameters such that $S \equiv
+\{\tau = 0\} = \{\underit{$\tau$} = 0\} \equiv S_0$.
+
+\subsubsection*{Relationsihp between the area of sections $S_\tau$ and the second fundamental forms $\chits$
+and $\underit{\chits}$:} 
+The area relates, as we shall see later, the
+$\mathrm{det}\cancel{g}$ to $\mathrm{tr}\chits$ and helps deduce the regularity of the
+null hypersurfaces. We present the solutions only corresponding to the
+hypersurface $C$. The computations are same for \underit{C}.\\
+We assume the canonical coordinates $\left(\tau, \theta^1, \theta^2\right)$ on
+$C$, where $\left(\theta^1, \theta^2\right) \in \mathcal{U} \subset \mathbb{R}^2$
+and $\cancel{g}$ is the induced metric on the sections $S_\tau$ of $C$.
+
+In the following, we use the first variational formula and the Jacobi formula
+for the derivative of a matrix determinant:
+\begin{equation*}
+    \begin{aligned}
+        \nabla_L\left(\sqrt{\det{\cancel{g}}}\right) \hspace{0.5em} &= \hspace{0.5em} \frac{1}{2\sqrt{\det\cancel{g}}}\nabla_L\left(\det{\cancel{g}}\right) \hspace{0.5em}= \hspace{0.5em} \frac{1}{2\sqrt{\det\cancel{g}}}\left(\det\cancel{g}\right)\mathrm{tr}\left(\left(\cancel{g}^{-1}\right)^{AB}\nabla_L\cancel{g}_{AB}\right)\\[1em]
+                                                                    &= \hspace{0.5em} \frac{\sqrt{\det\cancel{g}}}{2}\mathrm{tr}\left(\left(\cancel{g}^{-1}\right)^{AB}\mathcal{L}_L\cancel{g}_{AB}\right) \hspace{0.5em} = \hspace{0.5em} \frac{\sqrt{\det\cancel{g}}}{2}\mathrm{tr}\left(\left(\cancel{g}^{-1}\right)^{AB}2\chits_{AB}\right)\\[1em]
+                                                                    &= \hspace{0.5em} \sqrt{\det\cancel{g}}\hspace{0.4em}\mathrm{tr}\left(\chits\right)
+    \end{aligned}
+\end{equation*}
+We know, 
+\begin{equation*}
+    \mathrm{Area}\left(S_\tau\right) = \int\limits_{\mathcal{U}} \sqrt{\det\cancel{g}\left(\tau\right)} \: d\theta^1 d\theta^2
+\end{equation*}
+Thus, 
+\begin{equation*}
+    \nabla_L\left(\mathrm{Area}\left(S_\tau\right)\right) = \int\limits_{\mathcal{U}}\mathrm{tr}\mathrm{\chits}d\hspace{-0.2em}\mu_{\cancel{g}}.
+\end{equation*}
+More generally,
+\begin{equation}{\label{eq:AreachangealongL}}
+    \nabla_{fL}\left(\mathrm{Area}\left(S_\tau\right)\right) = \int\limits_{\mathcal{U}}f\cdot\mathrm{tr}\mathrm{\chits}d\hspace{-0.2em}\mu_{\cancel{g}}\;, \quad \forall f \geq 0 \text{ and } f \in C^\infty\left(S_\tau\right).
+\end{equation}
+{\bfseries{Interpretation:}} The equations above represent the rate of change of
+the second fundamental form $\chits$  and the rate of change of the area of
+$S_\tau$ under infinitesimal displacement along the null generators. Therefore,
+$\mathrm{tr}\chits$ is also called expansion of $S_\tau$.
+
+\begin{definition}[Trapped Surfaces]
+A 2-dimensional surface $S$ in $\left(\mathcal{M}, g\right)$ for which the area
+decreases under infinitesimal (arbitrary) displacements along the null
+generators of both null geodesics congruences $C \cup \underit{C}$ normal to
+$S$.
+\end{definition}
+If $\left(\mathcal{M}, g\right)$ is globally hyperbolic with a trapped surface,
+implies that $C \cup \textit{C}$ bounds the future of S, i.e.,
+$\partial\hspace{-0.3em}\mathcal{J}^+\left(S\right) \subset C \cup \underit{C}$.
+Hence, it cannot expand in its future. Thus the term \textit{trapped}. It is for
+this reason \eqref{eq:BCnotalwaystrue} does not always hold true.\\
+In view of this definition and \eqref{eq:AreachangealongL}, for a trapped
+surface, the following statements holds:
+\begin{equation*}
+    \int\limits_{\mathcal{U}}f\cdot\mathrm{tr}\chits\;d\hspace{-0.2em}\mu_{\cancel{g}}\; < \;0\;, \quad \int\limits_{\mathcal{U}}f\cdot\mathrm{tr}\underit{\chits}\;d\hspace{-0.2em}\mu_{\cancel{g}}\; < \;0 \quad \forall f \geq 0 \text{ and } f\in C^\infty\left(S_\tau\right)
+\end{equation*}
+\textit{Equivalent definition for Trapped Surfaces:} A trapped surface is a
+closed 2-dimensional surface $S$ in a Lorentzian manifold $\left(\mathcal{M},
+g\right)$ such that:
+\begin{equation*}
+    \mathrm{tr}\chits\; < \;0\;, \quad \mathrm{tr}\underit{\chits}\; < \;0
+\end{equation*}
+
+\subsubsection{Trapped surfaces and focal points:}
+A null generators on an incoming null hypersurface $\underit{C}$ contain focal
+points. The null expansion of an incoming null hypersurface, in our case
+$\underit{C}$ is negative. The following proposition shows that these two
+properties are related:
+\begin{proposition}{\label{PropFocalPointTS}}
+    Assume $S$ to be a closed two-dimensional surface (not necessarily
+    trapped) in a Lorentzian manifold $\left(\mathcal{M}, g\right)$ which
+    satisfies the Einstein equation $\mathrm{Ric}\left(g\right) = 0$. If
+    $\mathrm{tr}\chits < 0$ at some point $x\in S$, then $\exists$ a focal point
+    on the null generator $G_x$ of $C$ emanating from point $x$. A similar
+    result holds for $\underit{C}$.
+\end{proposition}
+\begin{proof}[Proof to Proposition \ref{PropFocalPointTS}]
+    Using Raychaudhari equation\footnote[5]{\hspace{0.3em}For our case, the null lapse function, $\Omega = 1$, hence $\omega = 0$.},
+    \begin{equation*}
+        \cancel{\nabla}_4\left(\mathrm{tr}\chits\right) = -\left|{\chits}\right|^2 + \omega\mathrm{tr}\chits
+    \end{equation*}
+    and \textcolor{red}{the other equation:}
+    \begin{equation*}
+        \left|\chits\right|^2 = \frac{1}{2}\left(\mathrm{tr}\chits\right)^2 + |\hat{\chits}|^2
+    \end{equation*}
+    we get, the following Riccati-type equation\footnote[4]{\hspace{0.3em}Riccati-type equations have a finite-time blow-up.}:
+    \begin{equation}{\label{eq:Riccatieq}}
+        \nabla_L\left(\mathrm{tr}\chits\right) = -\frac{1}{2}\left(\mathrm{tr}\chits\right)^2 - |\hat{\chits}|^2 \leq 0
+    \end{equation}
+    If $T = \mathrm{tr}\chits_x = \mathrm{tr}\chits\hspace{-0.2em}\left(0\right) < 0$, then
+    $\mathrm{tr}\chits\hspace{-0.2em}\left(\tau\right) < 0\;, \hspace{0.8em} \forall \tau \geq 0$. \\
+    Ignoring the term $|\hat{\chits}|$, yields:
+    \begin{equation*}
+        \nabla_L\left(-\frac{1}{\mathrm{tr}\chits}\right) \leq -\frac{1}{2}
+    \end{equation*}
+    Thus,
+    \begin{align*}
+        \scalebox{0.7}{$\implies$} & \nabla_L\left(-\frac{1}{\mathrm{tr}\chits}\right) \leq -\frac{1}{2}\\[0.8em]
+        \scalebox{0.7}{$\implies$} & -\frac{1}{\mathrm{tr}\chits} \leq -\frac{1}{T} - \frac{\tau}{2}\\[0.8em]
+        \scalebox{0.7}{$\implies$} & \tau_* = \frac{2}{-T} = \frac{2}{-\mathrm{tr}\chits_x}
+    \end{align*}
+    We obtain $\mathrm{tr}\chits\left(\tau_*\right) = -\infty$ and hence $G_x\left(\tau_*\right)$ is the first focal point on $G_x$.
+\end{proof}
+{\bfseries{Remarks:}} The equality in equation \eqref{eq:Riccatieq} holds for
+$\mathrm{Ric}\left(L, L\right) = \mathrm{tr}\;\alpha = 0$. From second
+variational formula \textcolor{red}{insert equation no.}, we see that
+Riccati-type equation similar to equation\ref{eq:Riccatieq} can be obtained for
+a more relaxed condition, $\mathrm{tr}\alpha = \mathrm{Ric}\left(L, L\right)\geq
+0$. This is also called as the \textit{positive null energy condition}, which is
+weaker than the Einstein equations. Hence, the proposition
+\ref{PropFocalPointTS} also holds for the positive null energy condition.
+
 
 
 %================== PENROSE INCOMPLETENESS THEOREM ==========================
