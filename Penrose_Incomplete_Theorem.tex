@@ -6,6 +6,9 @@
     \usepackage{titlesec}
     \usepackage{amsmath, xparse} %for cross-referencing math equations
     \usepackage[mathscr]{eucal}
+    \usepackage{mathalfa}
+
+
     %\usepackage{amsfonts}
     \usepackage{amsthm}
     %\usepackage{amssymb}
@@ -172,17 +175,172 @@
 
 %=================TABLE OF CONTENTS AND LIST OF FIGURES=======================
 \section*{Introduction}
-This is the placeholder for introduction.
+This is the placeholder for introduction. 
 
 \section{Double Null Hypersurfaces and Foliations}
 This is the first chapter
 
 \section{Null Structure Equations}
-This is the second chapter 
+This is the second chapter
 
-\section{Condition for Regularity of Null Hypersurfaces}
-This is the third chapter
 
+\section{Regularity of Null Hypersurfaces}
+For further discussion, we restrict ourselves to one hypersurface $C$ in
+$\left(\mathcal{M}, g\right)$, hence $\Omega = 1$.
+\begin{equation*}
+    \omega = \nabla_4\mathrm{log}\hspace{0.2em}\Omega = 0\; \quad \scalebox{0.8}{$\implies$} \quad \eta = -\underit{$\eta$} = \zeta
+\end{equation*}
+In this case, the geodesic, the normalized, and the equivariant coordinates all
+coincide on $C$. Therefore, $L$ is tangential to $C$ and $\nabla_L L = 0$ holds.
+Let $S_\tau$ be the level set of the affine parameter of $L$ on $C$ such that
+$S_\tau = \mathcal{F}_\tau\left(S\right)$. Additionally, $\mathit{\mathcal{S}} =
+\cup_\tau S_\tau$ is the affine foliation of $C$. In other words, $S_\tau$ are
+sections of $C$.
+
+\subsection{Jacobi Fields and Tidal Forces}
+\begin{definition}
+    A vector field $X$ on $C$ is called a normal Jacobi field if $\mathcal{L}_L
+    X = 0$. This implies, $\left[L, X\right] = 0$.
+\end{definition}
+The definition above implies $X$ is tangent to the section $S_\tau$ of the
+affine foliation of $C$. The reason $X$ is so called because it represents the
+infinitesimal displacement of the null generators around a fixed null generator.
+Mathematically, this can be expressed as:\\
+If $\gamma$ is a curve on $S$, such that:
+such that 
+\begin{equation*}
+    \gamma: \left(-\varepsilon, \varepsilon\right) \to S_\tau \quad \gamma\left(0\right) = x\;, \quad \dot{\gamma}\left(0\right) = E_i\hspace{-0.1em}\left(\tau\right).
+\end{equation*}
+where, $E_i\left(\tau\right), \: i = \{1, 2\}$ represent an orthonormal frame
+which is tangent to the section $S_\tau$. It follows that for a fixed point (on
+a section for a chosen value of $\tau$), $E_i$ represents an orthonormal basis for
+$X$.Then, we have a mapping: 
+\begin{equation*}
+    \Phi : \left(-\varepsilon, \varepsilon\right) \times [0, \infty) \to C\;, \quad \left(s, \tau\right) \erelbar{21} G_{\gamma\left(s\right)}\left(\tau\right).
+\end{equation*}
+Here, $G_{\gamma\left(s\right)}\left(\tilde{\tau}\right)$ represent the displacement
+field of $G_x\left(\tau\right)$ along null generators. Thus,
+\begin{equation*}
+    \left(E_i\right)_{G_x\left(\tau\right)} = d\hspace{-0.1em}\mathcal{F}_{\hspace{-0.1em}\tau}\left(\left(E_i\right)_x\right).
+\end{equation*}
+For a fixed $\tau =
+\tilde{\tau}$, we have $\Phi\left(s, \tilde{\tau}\right) = \alpha\left(s\right)
+= G_{\gamma\left(s\right)}\left(\tilde{\tau}\right)$, which represent the
+displacement field of $G_x\left(\tau\right)$ along null generators, such that:
+\begin{equation*}
+    \frac{d}{d\hspace{-0.1em}s}\bigg|_{s=0}G_{\gamma_i\left(s\right)}\left(\tilde{\tau}\right) = E_i.
+\end{equation*}
+
+\subsubsection{Fermi Frame}
+We consider an orthonormal frame, $E_i\left(0\right)$ of $T_x S_0$. To
+understand how these frames evolve as we move along a null generator $G_x$ such
+that at each point $G_x\left(\tau\right)$ we obtain an orthonormal frame
+$T_{G_x\left(\tau\right)}S_\tau$. One way to do this is by considering a
+\textit{Fermi frame}, constructed as:
+\begin{equation*}
+    \nabla_L E_i = -\zeta_i L, \quad \text{where } \zeta_i = \zeta\left(E_i\right).
+\end{equation*}
+This implies, $L\left(g\left(E_i, K\right)\right) = 0$ where $K\in \{E_j, L,
+\underit{L}\}, \; j = 1, 2$. Such a construction ensures that if
+$E_i\left(0\right), \; i = 1, 2$ is an orthonormal frame of $T_x S_0$ then
+$E_i\left(\tau\right), \; i = 1, 2$, is an orthonormal frame of $T_{G_x\left(\tau\right)}S_\tau$.
+
+\subsubsection{Propagation equation of Jacobi Fields}
+Starting from the fact that $E_i\left(\tau\right),\; i = 1, 2$ is an orthonormal
+basis, we can express $X$ as:
+\begin{equation}{\label{eq:GeneralizedJacobiX}}
+    X = X^i\left(\tau\right)\cdot E_i\left(\tau\right).
+\end{equation}
+Starting by computing $\nabla_L X$ and using $g\left(\nabla_L X, E_j\right)$ in
+the Fermi frame, we find $X^i$ satisfy the following 1st order linear system of
+equations:
+\begin{equation}{\label{eq:1storderPropagationEq}}
+    \frac{d\hspace{-0.1em}X^i\left(\tau\right)}{d\hspace{-0.1em}\tau} = \chits_{\hspace{-0.1em}{ij}}X^j
+\end{equation}
+However, the connection coefficients $\chits_{\hspace{-0.1em}ij}$ depend on the
+null hypersurface regularity and not on the regularity of the ambient metric
+$g$. Therefore, we compute the second order equations to find propagation
+equations for $X^i$ which only depend on the Riemannian curvature of $g$.
+Starting from the Jacobi equation given by 
+\begin{equation}{\label{eq:Jacobiequation}}
+J_L X = \nabla_L\nabla_L X - R\left(L, X\right)L = 0,
+\end{equation} 
+where, $J_L$ is the tidal operator, we find $g\left(\nabla_L\nabla_L X,\;
+E_j\right) = \alpha_{ij}X^i$. Here, $\alpha$ is the curvature component
+introduced \textcolor{red}{insert section number}. Upon taking the covariant
+derivative of $\nabla_L X$ and of equation \eqref{eq:1storderPropagationEq} with
+respect to $L$ and equation, we get the following desired 2nd order propagation
+equation of $X^i$:
+\begin{equation}{\label{eq:2ndorderPropagationEq}}
+    \frac{d^2\hspace{-0.1em}X^i\left(\tau\right)}{d\hspace{-0.1em}\tau^2} = \alpha_{\hspace{-0.1em}{ij}}X^j.
+\end{equation}
+The right hand side of equation \eqref{eq:2ndorderPropagationEq} tells as long
+as the spacetime metric $g$ remains smooth, the components of $X^i$ of the
+normal Jacobi vector field satisfy linear second order system of equations.
+Assuming a well-defined initial data $X^i\left(0\right)$, $\exists$ smooth curve
+of matrices $M\left(\tau\right)$ such that the solution of
+$X^i\left(\tau\right)$ take the form:
+\begin{equation}{\label{eq:GeneralSolutiontoX}}
+    X^i\left(\tau\right) = M^i_j\hspace{-0.1em}\left(\tau\right)X^j\left(0\right).
+\end{equation}
+For $\tau = 0$, $M\left(0\right) = I$, hence $\mathrm{det}M\left(0\right) = 1$.
+The matrix $M$ measures the rate of change of the normal Jacobi field $X$ along
+$G_x$ with respect to its initial value $X\left(0\right) = X_x$. Thus, $M$ is
+also referred to as the \textit{deformation matrix}.\\
+The propagation equation for $M$, obtained from equation
+\eqref{eq:1storderPropagationEq}, comes out to be:
+\begin{equation}{\label{eq:PropagationEqM}}
+    \frac{d\hspace{-0.1em}M\left(\tau\right)}{d\hspace{-0.1em}\tau} = \chits \times M.
+\end{equation}
+
+\subsection{Focal Points}
+The deformation matrix $M$ is invertible as long as the flow
+$\mathcal{F}_{\hspace{-0.1em}\tau}$ of $L$ induces isomorphisms between $T_x
+S_0$ and $T_{G_x\left(\tau\right)}S_\tau$. Nevertheless, the null generators
+nearby $G_x$ may converge to $G_x$ such that $X = 0$ at some point
+$G_x\left(\tau_f\right)$ along $G_x$. Points such as
+$G_x\left(\tau_f\right)$\footnote[8]{Assume $\tau_f$ to be the first time for
+which we have a focal point along $G_x$.} are called \textit{focal point} of
+$C$. For these focal points, the regularity of null hypersurfaces break down and
+the extension of geodesics along these null generators beyond the focal points
+is not possible.\\
+
+To be able to mathematically interpret this, we express the vanishing of normal
+Jacobi field $X$ in terms of deformation matrix $M$. From equation
+\eqref{eq:PropagationEqM}, $\forall \tau\in[0, \hspace{0.1em}\tau_f), \; \tau \neq \tau_f$, we
+can write:
+\begin{equation*}
+    \chits = \frac{d\hspace{-0.1em}M}{d\hspace{-0.1em}\tau} \times M^{-1}.
+\end{equation*}
+Computing the derivative of $\mathrm{det}M$ with respect to $\tau$ using Jacobi
+formula for derivative of determinant, we get\footnote[5]{Recall, that $\chits$
+is the second null fundamental form on $S_\tau$ and is calculated with respect
+to the induced metric $\cancel{g}$. $\mathrm{tr}\chits$ with respect to the
+Fermi frame is simply the identity matrix.}:
+\begin{equation}{\label{eq:trXderivativedetM}}
+    \mathrm{tr}\chits = \frac{1}{\mathrm{det}M}\frac{d\mathrm{det}M}{d\hspace{-0.1em}\tau}.
+\end{equation}
+Since the null generators near $G_x$ get closer to $G_x$ along the flow
+$\mathcal{F}_{\hspace{-0.1em}\tau}$, we can say as $\tau \to \tau_f$:
+\begin{equation*}
+    \frac{d\mathrm{det}M}{d\hspace{-0.1em}\tau} \leq 0, \quad \text{and } \quad \mathrm{det}M \to 0^+.
+\end{equation*}
+Therefore,
+\begin{equation}{\label{eq:EqRegularitybreakdown}}
+    \mathrm{tr}\chits = -\infty.
+\end{equation}
+Equation \eqref{eq:EqRegularitybreakdown} shows the geometry of the null hypersurface
+$C$ breaks down at the focal points.
+ 
+
+
+
+
+
+
+
+
+%========== CAUSALITY IN CONTEXT OF TRAPPED SURFACES ====================
 \section{Causality for Spacetimes with Trapped Surfaces}
 Recall the geometric construction in the previous sections. If $S$ is a closed
 2-dimensional surface in a globally hyperbolic time-orientable spacetime
